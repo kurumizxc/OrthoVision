@@ -1,0 +1,74 @@
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi import FastAPI, UploadFile, File
+from fastapi.responses import JSONResponse
+from PIL import Image
+from io import BytesIO
+from orthovision.hybrid_detector import HybridFractureDetector
+import base64
+
+
+app = FastAPI(title="OrthoVision Backend", version="0.1.0")
+
+# Configure permissive CORS for development. Tighten in production.
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Replace with specific origins in production
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# --- Load Models Once on Startup ---
+model = HybridFractureDetector(
+    resnet_path="models/best_model_f1_focused.pth",
+    yolo_path="models/best.pt"
+)
+
+
+@app.get("/")
+async def read_root():
+    return {"message": "Hello, World!"}
+
+@app.post("/detect")
+async def detect_fracture(image: UploadFile = File(...)):
+    """
+    Endpoint to detect fractures in X-ray images.
+    
+    Args:
+        image: Uploaded image file (JPEG/PNG)
+    
+    Returns:
+        JSON response with classification, confidence, recommendation, original image, 
+        image dimensions, and bounding box detections
+    """
+    try:
+        contents = await image.read()
+        pil_image = Image.open(BytesIO(contents))
+
+        # Get image dimensions
+        width, height = pil_image.size
+
+        # Process image to get classification and detections
+        result = model.process_image(pil_image)
+
+        # Convert original image to base64
+        buffered = BytesIO()
+        pil_image.save(buffered, format="JPEG")
+        image_b64 = f"data:image/jpeg;base64,{base64.b64encode(buffered.getvalue()).decode('utf-8')}"
+
+        return JSONResponse({
+            "class": result["class"],
+            "confidence": f"{result['confidence'] * 100:.2f}%",
+            "recommendation": result["recommendation"],
+            "image": image_b64,
+            "imageWidth": width,
+            "imageHeight": height,
+            "detections": result["detections"]
+        })
+
+    except Exception as e:
+        import traceback
+        print(f"Error processing image: {str(e)}")
+        print(traceback.format_exc())
+        return JSONResponse(status_code=500, content={"error": str(e)})
+

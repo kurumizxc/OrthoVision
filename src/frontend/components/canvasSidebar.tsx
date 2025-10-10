@@ -5,16 +5,18 @@ import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Sidebar, SidebarHeader, SidebarContent } from "@/components/ui/sidebar"
 import { CanvasSidebarContent } from "./canvasSidebarContent"
-import type { ImageData } from "@/types/image"
+import type { ImageDataWithResult } from "@/types/image"
 
 interface CanvasSidebarProps {
-  image: ImageData
+  image: ImageDataWithResult
   imageRotation: number
   stageScale: number
   stagePosition: { x: number; y: number }
   rotateImage: () => void
   resetView: () => void
   downloadCanvas: () => void
+  showBoundingBoxes: boolean
+  toggleBoundingBoxes: () => void
 }
 
 export function CanvasSidebar({
@@ -25,6 +27,8 @@ export function CanvasSidebar({
   rotateImage,
   resetView,
   downloadCanvas,
+  showBoundingBoxes,
+  toggleBoundingBoxes,
 }: CanvasSidebarProps) {
   const router = useRouter()
 
@@ -45,6 +49,8 @@ export function CanvasSidebar({
           rotateImage={rotateImage}
           resetView={resetView}
           downloadCanvas={downloadCanvas}
+          showBoundingBoxes={showBoundingBoxes}
+          toggleBoundingBoxes={toggleBoundingBoxes}
         />
       </SidebarContent>
     </Sidebar>

@@ -5,10 +5,11 @@ import { Button } from "@/components/ui/button"
 import { useRouter } from "next/navigation"
 import { UploadArea } from "@/components/uploadArea"
 import { SampleImagesSection } from "@/components/sampleImages"
-import type { ImageData } from "@/types/image"
+import type { ImageData, ImageDataWithResult } from "@/types/image"
 import toast from "react-hot-toast"
 import { motion } from "motion/react"
 import { buttonVariants } from "@/lib/animations"
+import { detectFracture } from "@/lib/api"
 
 interface SampleImage extends ImageData {
   id: number
@@ -59,57 +60,56 @@ export function UploadMainSection({
       throw new Error("Please select an image to upload.")
     }
 
-    let imageData: ImageData
+    // First, prepare the image data
+    const imageData: ImageData = uploadedFile
+      ? await new Promise<ImageData>((resolve, reject) => {
+          const reader = new FileReader()
 
-    if (uploadedFile) {
-      return new Promise((resolve, reject) => {
-        const reader = new FileReader()
-
-        reader.onloadend = () => {
-          try {
-            imageData = {
-              name: uploadedFile.name,
-              size: uploadedFile.size,
-              type: uploadedFile.type,
-              url: reader.result as string,
+          reader.onloadend = () => {
+            try {
+              resolve({
+                name: uploadedFile.name,
+                size: uploadedFile.size,
+                type: uploadedFile.type,
+                url: reader.result as string,
+              })
+            } catch (error) {
+              reject(new Error("Failed to process image file."))
             }
-            sessionStorage.setItem("uploadedImage", JSON.stringify(imageData))
-            setTimeout(() => {
-              router.push("/canvas")
-              resolve()
-            }, 500)
-          } catch (error) {
-            reject(new Error("Failed to process image file."))
           }
-        }
 
-        reader.onerror = () => {
-          reject(new Error("Failed to read image file."))
-        }
+          reader.onerror = () => {
+            reject(new Error("Failed to read image file."))
+          }
 
-        reader.readAsDataURL(uploadedFile)
-      })
-    } else if (selectedSample) {
-      return new Promise((resolve, reject) => {
-        try {
-          imageData = {
+          reader.readAsDataURL(uploadedFile)
+        })
+      : selectedSample
+        ? {
             name: selectedSample.name,
             size: selectedSample.size,
             type: selectedSample.type,
             url: selectedSample.url,
           }
-          sessionStorage.setItem("uploadedImage", JSON.stringify(imageData))
-          setTimeout(() => {
-            router.push("/canvas")
-            resolve()
-          }, 300)
-        } catch (error) {
-          reject(new Error("Failed to process sample image."))
-        }
-      })
-    } else {
-      throw new Error("No image selected.")
+        : (() => {
+            throw new Error("No image selected.")
+          })()
+
+    // Call the backend API to detect fractures
+    const detectionResult = await detectFracture(uploadedFile || imageData.url)
+
+    // Combine image data with detection result
+    const imageDataWithResult: ImageDataWithResult = {
+      ...imageData,
+      detectionResult,
     }
+
+    // Store in sessionStorage and navigate
+    sessionStorage.setItem("uploadedImage", JSON.stringify(imageDataWithResult))
+    
+    // Small delay for better UX
+    await new Promise((resolve) => setTimeout(resolve, 500))
+    router.push("/canvas")
   }, [currentImage, uploadedFile, selectedSample, router])
 
   const handleSubmit = useCallback(async () => {
@@ -123,9 +123,9 @@ export function UploadMainSection({
     const uploadPromise = processUpload()
 
     toast.promise(uploadPromise, {
-      loading: "Uploading image...",
-      success: "Image uploaded successfully!",
-      error: (err) => err.message || "Upload failed. Please try again.",
+      loading: "Analyzing image...",
+      success: "Analysis complete!",
+      error: (err) => err.message || "Analysis failed. Please try again.",
     })
 
     try {

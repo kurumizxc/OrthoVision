@@ -7,17 +7,19 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar"
-import { RotateCw, Download, Home } from "lucide-react"
-import type { ImageData } from "@/types/image"
+import { RotateCw, Download, Home, Eye, EyeOff } from "lucide-react"
+import type { ImageDataWithResult } from "@/types/image"
 
 interface CanvasSidebarContentProps {
-  image: ImageData
+  image: ImageDataWithResult
   imageRotation: number
   stageScale: number
   stagePosition: { x: number; y: number }
   rotateImage: () => void
   resetView: () => void
   downloadCanvas: () => void
+  showBoundingBoxes: boolean
+  toggleBoundingBoxes: () => void
 }
 
 export function CanvasSidebarContent({
@@ -28,7 +30,12 @@ export function CanvasSidebarContent({
   rotateImage,
   resetView,
   downloadCanvas,
+  showBoundingBoxes,
+  toggleBoundingBoxes,
 }: CanvasSidebarContentProps) {
+  const hasDetectionResult = !!image.detectionResult
+  const isFractured = image.detectionResult?.class === "Fractured"
+  const hasDetections = (image.detectionResult?.detections?.length || 0) > 0
   return (
     <>
       <SidebarGroup>
@@ -63,29 +70,47 @@ export function CanvasSidebarContent({
             <SidebarMenuItem>
               <SidebarMenuButton onClick={downloadCanvas}>
                 <Download className="h-4 w-4" />
-                Download Canvas
+                Download Image
               </SidebarMenuButton>
             </SidebarMenuItem>
+            {hasDetections && (
+              <SidebarMenuItem>
+                <SidebarMenuButton onClick={toggleBoundingBoxes}>
+                  {showBoundingBoxes ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  {showBoundingBoxes ? "Hide Detections" : "Show Detections"}
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            )}
           </SidebarMenu>
         </SidebarGroupContent>
       </SidebarGroup>
 
-      <SidebarGroup>
-        <SidebarGroupLabel>Results</SidebarGroupLabel>
-        <SidebarGroupContent>
-          <div className="p-3 text-sm text-gray-600 space-y-2">
-            <p>
-              <strong>Findings:</strong> Fractured {/* Non Fractured */}
-            </p>
-            <p>
-              <strong>Confidence:</strong> 99% {/* Confident Percent */}
-            </p>
-            <p className="text-justify">
-              <strong>Recommendation:</strong> Fracture identified on the imaging results. Please monitor the condition closely and refer to orthopedics for further evaluation and management. {/* No signs of fracture on the imaging results. Please monitor the condition and refer to orthopedics for further evaluation if needed */}
-            </p>
-          </div>
-        </SidebarGroupContent>
-      </SidebarGroup>
+      {hasDetectionResult && image.detectionResult && (
+        <SidebarGroup>
+          <SidebarGroupLabel>Detection Results</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <div className="p-3 text-sm text-gray-600 space-y-2">
+              <p>
+                <strong>Findings:</strong>{" "}
+                <span className={isFractured ? "text-red-600 font-semibold" : "text-green-600 font-semibold"}>
+                  {image.detectionResult.class}
+                </span>
+              </p>
+              <p>
+                <strong>Confidence:</strong> {image.detectionResult.confidence}
+              </p>
+              {hasDetections && (
+                <p>
+                  <strong>Detections:</strong> {image.detectionResult.detections.length} fracture area(s) found
+                </p>
+              )}
+              <p className="text-justify">
+                <strong>Recommendation:</strong> {image.detectionResult.recommendation}
+              </p>
+            </div>
+          </SidebarGroupContent>
+        </SidebarGroup>
+      )}
 
       <SidebarGroup>
         <SidebarGroupLabel>Controls</SidebarGroupLabel>
@@ -98,10 +123,7 @@ export function CanvasSidebarContent({
               • <strong>Drag Canvas:</strong> Pan around
             </p>
             <p>
-              • <strong>Drag Image:</strong> Move image
-            </p>
-            <p>
-              • <strong>Rotate:</strong> 90° clockwise
+              • <strong>Rotate Button:</strong> 90° clockwise
             </p>
           </div>
         </SidebarGroupContent>
