@@ -2,6 +2,7 @@
 
 import { ArrowLeft } from "lucide-react"
 import { useRouter } from "next/navigation"
+import { useCallback, memo } from "react"
 import { Button } from "@/components/ui/button"
 import { Sidebar, SidebarHeader, SidebarContent } from "@/components/ui/sidebar"
 import { CanvasSidebarContent } from "./canvasSidebarContent"
@@ -19,7 +20,7 @@ interface CanvasSidebarProps {
   toggleBoundingBoxes: () => void
 }
 
-export function CanvasSidebar({
+export const CanvasSidebar = memo(function CanvasSidebar({
   image,
   imageRotation,
   stageScale,
@@ -32,10 +33,14 @@ export function CanvasSidebar({
 }: CanvasSidebarProps) {
   const router = useRouter()
 
+  const handleBackClick = useCallback(() => {
+    router.push("/")
+  }, [router])
+
   return (
     <Sidebar side="left" mobileSide="top" collapsible="offcanvas" className="flex-col gap-y-3">
       <SidebarHeader>
-        <Button variant="ghost" size="sm" onClick={() => router.push("/")}>
+        <Button variant="ghost" size="sm" onClick={handleBackClick}>
           <ArrowLeft className="h-4 w-4" />
           Back
         </Button>
@@ -55,4 +60,4 @@ export function CanvasSidebar({
       </SidebarContent>
     </Sidebar>
   )
-}
+})

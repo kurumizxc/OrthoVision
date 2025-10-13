@@ -6,14 +6,12 @@ import { useRouter } from "next/navigation"
 import { UploadArea } from "@/components/uploadArea"
 import { SampleImagesSection } from "@/components/sampleImages"
 import type { ImageData, ImageDataWithResult } from "@/types/image"
+import type { SampleImage } from "@/types/sampleImage"
 import toast from "react-hot-toast"
 import { motion } from "motion/react"
 import { buttonVariants } from "@/lib/animations"
 import { detectFracture } from "@/lib/api"
-
-interface SampleImage extends ImageData {
-  id: number
-}
+import { useFileToBase64 } from "@/hooks/useFileReader"
 
 interface UploadMainSectionProps {
   imagePreview: string | null
@@ -36,6 +34,7 @@ export function UploadMainSection({
   const [uploadedFile, setUploadedFile] = useState<File | null>(null)
   const [isUploading, setIsUploading] = useState(false)
   const router = useRouter()
+  const fileToBase64 = useFileToBase64()
 
   const handleFileAccepted = useCallback(
     (file: File) => {
@@ -43,7 +42,7 @@ export function UploadMainSection({
       setSelectedSample(null)
       onFileAccepted(file)
     },
-    [onFileAccepted],
+    [onFileAccepted]
   )
 
   const handleSampleSelect = useCallback(
@@ -52,39 +51,23 @@ export function UploadMainSection({
       setUploadedFile(null)
       onSelectSample(sample)
     },
-    [onSelectSample],
+    [onSelectSample]
   )
 
-  const processUpload = useCallback(async (): Promise<void> => {
-    if (!currentImage) {
-      throw new Error("Please select an image to upload.")
-    }
+  const processUpload = useCallback(
+    async (): Promise<void> => {
+      if (!currentImage) {
+        throw new Error("Please select an image to upload.")
+      }
 
-    // First, prepare the image data
-    const imageData: ImageData = uploadedFile
-      ? await new Promise<ImageData>((resolve, reject) => {
-          const reader = new FileReader()
-
-          reader.onloadend = () => {
-            try {
-              resolve({
-                name: uploadedFile.name,
-                size: uploadedFile.size,
-                type: uploadedFile.type,
-                url: reader.result as string,
-              })
-            } catch (error) {
-              reject(new Error("Failed to process image file."))
-            }
+      const imageData: ImageData = uploadedFile
+        ? {
+            name: uploadedFile.name,
+            size: uploadedFile.size,
+            type: uploadedFile.type,
+            url: await fileToBase64(uploadedFile),
           }
-
-          reader.onerror = () => {
-            reject(new Error("Failed to read image file."))
-          }
-
-          reader.readAsDataURL(uploadedFile)
-        })
-      : selectedSample
+        : selectedSample
         ? {
             name: selectedSample.name,
             size: selectedSample.size,
@@ -95,22 +78,20 @@ export function UploadMainSection({
             throw new Error("No image selected.")
           })()
 
-    // Call the backend API to detect fractures
-    const detectionResult = await detectFracture(uploadedFile || imageData.url)
+      const detectionResult = await detectFracture(uploadedFile || imageData.url)
 
-    // Combine image data with detection result
-    const imageDataWithResult: ImageDataWithResult = {
-      ...imageData,
-      detectionResult,
-    }
+      const imageDataWithResult: ImageDataWithResult = {
+        ...imageData,
+        detectionResult,
+      }
 
-    // Store in sessionStorage and navigate
-    sessionStorage.setItem("uploadedImage", JSON.stringify(imageDataWithResult))
-    
-    // Small delay for better UX
-    await new Promise((resolve) => setTimeout(resolve, 500))
-    router.push("/canvas")
-  }, [currentImage, uploadedFile, selectedSample, router])
+      sessionStorage.setItem("uploadedImage", JSON.stringify(imageDataWithResult))
+
+      await new Promise((resolve) => setTimeout(resolve, 500))
+      router.push("/canvas")
+    },
+    [currentImage, uploadedFile, selectedSample, router, fileToBase64]
+  )
 
   const handleSubmit = useCallback(async () => {
     if (!currentImage) {

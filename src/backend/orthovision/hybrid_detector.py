@@ -2,7 +2,6 @@ import torch
 import torchvision.transforms as transforms
 import torchvision.models as models
 import torch.nn as nn
-from PIL import Image
 from ultralytics import YOLO
 import logging
 

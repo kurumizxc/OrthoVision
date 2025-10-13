@@ -1,17 +1,14 @@
 "use client";
 
 import Image from "next/image";
-import type { ImageData } from "@/types/image";
 import { motion } from "motion/react";
+import { memo, useCallback } from "react";
 import {
   containerVariants,
   itemVariants,
   imageVariants,
 } from "@/lib/animations";
-
-interface SampleImage extends ImageData {
-  id: number;
-}
+import type { SampleImage } from "@/types/sampleImage";
 
 interface SampleImagesSectionProps {
   sampleImages: SampleImage[];
@@ -19,7 +16,7 @@ interface SampleImagesSectionProps {
   onSelectSample: (sample: SampleImage) => void;
 }
 
-export function SampleImagesSection({
+export const SampleImagesSection = memo(function SampleImagesSection({
   sampleImages,
   selectedSampleId,
   onSelectSample,
@@ -40,32 +37,55 @@ export function SampleImagesSection({
       <motion.div variants={itemVariants} className="flex justify-center">
         <div className="grid grid-cols-4 gap-3">
           {sampleImages.map((sample, index) => (
-            <motion.button
+            <SampleImageButton
               key={sample.id}
-              type="button"
-              variants={imageVariants}
-              custom={index}
-              className={`relative cursor-pointer overflow-hidden ${
-                selectedSampleId === sample.id
-                  ? "ring-2 ring-blue-500 rounded-md"
-                  : ""
-              }`}
-              onClick={() => onSelectSample(sample)}
-              aria-label={`Select sample image: ${sample.name}`}
-            >
-              <div className="w-16 h-16 bg-gray-200 overflow-hidden relative">
-                <Image
-                  src={sample.url || "/placeholder.svg"}
-                  alt={sample.name}
-                  fill
-                  className="object-cover rounded-md"
-                  sizes="64px"
-                />
-              </div>
-            </motion.button>
+              sample={sample}
+              index={index}
+              isSelected={selectedSampleId === sample.id}
+              onSelect={onSelectSample}
+            />
           ))}
         </div>
       </motion.div>
     </motion.div>
   );
-}
+});
+
+const SampleImageButton = memo(function SampleImageButton({
+  sample,
+  index,
+  isSelected,
+  onSelect,
+}: {
+  sample: SampleImage;
+  index: number;
+  isSelected: boolean;
+  onSelect: (sample: SampleImage) => void;
+}) {
+  const handleClick = useCallback(() => {
+    onSelect(sample);
+  }, [onSelect, sample]);
+
+  return (
+    <motion.button
+      type="button"
+      variants={imageVariants}
+      custom={index}
+      className={`relative cursor-pointer overflow-hidden ${
+        isSelected ? "ring-2 ring-blue-500 rounded-md" : ""
+      }`}
+      onClick={handleClick}
+      aria-label={`Select sample image: ${sample.name}`}
+    >
+      <div className="w-16 h-16 bg-gray-200 overflow-hidden relative">
+        <Image
+          src={sample.url || "/placeholder.svg"}
+          alt={sample.name}
+          fill
+          className="object-cover rounded-md"
+          sizes="64px"
+        />
+      </div>
+    </motion.button>
+  );
+});

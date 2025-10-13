@@ -4,7 +4,6 @@ from fastapi.responses import JSONResponse
 from PIL import Image
 from io import BytesIO
 from orthovision.hybrid_detector import HybridFractureDetector
-import base64
 
 
 app = FastAPI(title="OrthoVision Backend", version="0.1.0")
@@ -51,16 +50,11 @@ async def detect_fracture(image: UploadFile = File(...)):
         # Process image to get classification and detections
         result = model.process_image(pil_image)
 
-        # Convert original image to base64
-        buffered = BytesIO()
-        pil_image.save(buffered, format="JPEG")
-        image_b64 = f"data:image/jpeg;base64,{base64.b64encode(buffered.getvalue()).decode('utf-8')}"
-
+        # Return only detection data - frontend handles image display
         return JSONResponse({
             "class": result["class"],
             "confidence": f"{result['confidence'] * 100:.2f}%",
             "recommendation": result["recommendation"],
-            "image": image_b64,
             "imageWidth": width,
             "imageHeight": height,
             "detections": result["detections"]

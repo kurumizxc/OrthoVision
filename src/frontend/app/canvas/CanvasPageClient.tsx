@@ -1,22 +1,28 @@
-"use client"
+"use client";
 
-import { useEffect, useState } from "react"
-import { useRouter } from "next/navigation"
-import { CanvasEditor } from "@/components/canvasEditor"
-import type { ImageDataWithResult } from "@/types/image"
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { CanvasEditor } from "@/components/canvasEditor";
+import type { ImageDataWithResult } from "@/types/image";
 
+// This is a client-side page component for displaying the canvas editor
 export default function CanvasPageClient() {
-  const [image, setImage] = useState<ImageDataWithResult | null>(null)
-  const router = useRouter()
+  // State to hold the uploaded image data (with detection results)
+  const [image, setImage] = useState<ImageDataWithResult | null>(null);
+  const router = useRouter();
 
   useEffect(() => {
-    const stored = sessionStorage.getItem("uploadedImage")
+    // Try to retrieve the uploaded image from sessionStorage
+    const stored = sessionStorage.getItem("uploadedImage");
     if (stored) {
-      setImage(JSON.parse(stored) as ImageDataWithResult)
+      // If found, parse and set the image data
+      setImage(JSON.parse(stored) as ImageDataWithResult);
     } else {
-      router.push("/")
+      // If not found, redirect to the home page
+      router.push("/");
     }
-  }, [router])
+  }, [router]);
 
-  return image ? <CanvasEditor image={image} /> : <div>Loading...</div>
+  // Render the CanvasEditor if image data is available, otherwise show a loading message
+  return image ? <CanvasEditor image={image} /> : <div>Loading...</div>;
 }

@@ -1,15 +1,17 @@
 import type React from "react";
-import "../styles/globals.css"; // <-- Add this line at the very top
+import "../styles/globals.css";
 import { Inter } from "next/font/google";
 import type { Metadata } from "next";
 import { Toaster } from "react-hot-toast";
 
+// Configure Inter font with Next.js font loader
 const inter = Inter({
   subsets: ["latin"],
   variable: "--font-inter",
   display: "swap",
 });
 
+// Metadata for SEO and social sharing
 export const metadata: Metadata = {
   title: "OrthoVision - Fracture Classification and Localization",
   description:
@@ -58,6 +60,7 @@ export default function RootLayout({
       </head>
       <body>
         {children}
+        {/* Toast notifications for user feedback */}
         <Toaster
           position="top-center"
           toastOptions={{

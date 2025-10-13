@@ -14,12 +14,13 @@ interface UploadAreaProps {
   onFileAccepted: (file: File) => void
 }
 
-export function UploadArea({ imagePreview, currentImage, removeFile, onFileAccepted }: UploadAreaProps) {
-  const isValidImageType = (file: File) => {
-    const validTypes = ["image/jpeg", "image/jpg", "image/png"]
-    return validTypes.includes(file.type)
-  }
+const VALID_IMAGE_TYPES = ["image/jpeg", "image/jpg", "image/png"] as const
 
+const isValidImageType = (file: File): boolean => {
+  return VALID_IMAGE_TYPES.includes(file.type as (typeof VALID_IMAGE_TYPES)[number])
+}
+
+export function UploadArea({ imagePreview, currentImage, removeFile, onFileAccepted }: UploadAreaProps) {
   const onDrop = useCallback(
     (acceptedFiles: File[]) => {
       if (acceptedFiles.length > 0) {

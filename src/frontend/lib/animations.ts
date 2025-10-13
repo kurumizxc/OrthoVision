@@ -32,18 +32,8 @@ export const containerVariants = {
 
 export const itemVariants = slideUpVariants;
 
-export const imageVariants = {
-  hidden: { y: 20, opacity: 0 },
-  visible: {
-    y: 0,
-    opacity: 1,
-    transition: {
-      type: "spring" as const,
-      stiffness: 120,
-      damping: 12,
-    },
-  },
-};
+// imageVariants is identical to slideUpVariants
+export const imageVariants = slideUpVariants;
 
 export const buttonVariants = {
   hidden: { y: 20, opacity: 0 },
