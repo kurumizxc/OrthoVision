@@ -5,6 +5,10 @@ import {
   SidebarGroupLabel,
 } from "@/components/ui/sidebar";
 
+/**
+ * ImageInfo shows basic metadata for the selected image (name, size, type).
+ */
+
 interface ImageInfoProps {
   name: string;
   size: number;

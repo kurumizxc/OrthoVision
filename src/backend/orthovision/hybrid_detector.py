@@ -8,7 +8,18 @@ import logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 class HybridFractureDetector:
+    """Combines a ResNet classifier with a YOLO object detector.
+
+    Classifies an X-ray as Fractured/Non Fractured and, when fractured with
+    sufficient confidence, returns bounding boxes highlighting likely areas.
+    """
     def __init__(self, resnet_path: str, yolo_path: str):
+        """Load the classifier and detector checkpoints and preprocessing.
+
+        Args:
+            resnet_path: Path to the trained ResNet weights (.pth).
+            yolo_path: Path to the trained YOLO weights (.pt).
+        """
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
         self.detector = None
         self.classifier = None
@@ -42,7 +53,14 @@ class HybridFractureDetector:
         ])
 
     def process_image(self, image):
-        """Takes a PIL image, returns classification + bounding boxes (no image data)."""
+        """Run classification and conditional detection on a PIL image.
+
+        Args:
+            image: PIL.Image instance in any mode.
+
+        Returns:
+            dict with keys: class, confidence (0..1), detections (list), recommendation (str).
+        """
         results = {}
         image = image.convert('RGB')
 

@@ -2,25 +2,30 @@
 
 import Image from "next/image";
 import { motion } from "motion/react";
-import { memo, useCallback } from "react";
+import { useCallback } from "react";
 import {
   containerVariants,
   itemVariants,
-  imageVariants,
+  slideUpVariants,
 } from "@/lib/animations";
 import type { SampleImage } from "@/types/sampleImage";
 
-interface SampleImagesSectionProps {
+/**
+ * SampleImagesGrid renders a selectable grid of sample images
+ * Allows users to quickly try the app without uploading a file
+ */
+
+interface SampleImagesGridProps {
   sampleImages: SampleImage[];
   selectedSampleId: number | null;
   onSelectSample: (sample: SampleImage) => void;
 }
 
-export const SampleImagesSection = memo(function SampleImagesSection({
+export function SampleImagesGrid({
   sampleImages,
   selectedSampleId,
   onSelectSample,
-}: SampleImagesSectionProps) {
+}: SampleImagesGridProps) {
   return (
     <motion.div
       className="py-0 my-3.5"
@@ -49,19 +54,21 @@ export const SampleImagesSection = memo(function SampleImagesSection({
       </motion.div>
     </motion.div>
   );
-});
+}
 
-const SampleImageButton = memo(function SampleImageButton({
-  sample,
-  index,
-  isSelected,
-  onSelect,
-}: {
+interface SampleImageButtonProps {
   sample: SampleImage;
   index: number;
   isSelected: boolean;
   onSelect: (sample: SampleImage) => void;
-}) {
+}
+
+function SampleImageButton({
+  sample,
+  index,
+  isSelected,
+  onSelect,
+}: SampleImageButtonProps) {
   const handleClick = useCallback(() => {
     onSelect(sample);
   }, [onSelect, sample]);
@@ -69,7 +76,7 @@ const SampleImageButton = memo(function SampleImageButton({
   return (
     <motion.button
       type="button"
-      variants={imageVariants}
+      variants={slideUpVariants}
       custom={index}
       className={`relative cursor-pointer overflow-hidden ${
         isSelected ? "ring-2 ring-blue-500 rounded-md" : ""
@@ -88,4 +95,4 @@ const SampleImageButton = memo(function SampleImageButton({
       </div>
     </motion.button>
   );
-});
+}

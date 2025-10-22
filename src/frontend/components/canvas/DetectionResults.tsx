@@ -6,6 +6,11 @@ import {
 } from "@/components/ui/sidebar";
 import type { ImageDataWithResult } from "@/types/image";
 
+/**
+ * DetectionResults shows classification, confidence, count of detections,
+ * and the textual recommendation returned by the backend.
+ */
+
 interface DetectionResultsProps {
   detectionResult: NonNullable<ImageDataWithResult["detectionResult"]>;
 }

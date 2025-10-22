@@ -1,3 +1,6 @@
+/**
+ * Types for image payloads and detection results shared between UI and API.
+ */
 export interface ImageData {
   name: string;
   size: number;

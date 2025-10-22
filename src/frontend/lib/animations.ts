@@ -1,11 +1,3 @@
-export const fadeInVariants = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: { duration: 0.4, ease: "easeOut" },
-  },
-};
-
 export const slideUpVariants = {
   hidden: { y: 20, opacity: 0 },
   visible: {
@@ -32,9 +24,6 @@ export const containerVariants = {
 
 export const itemVariants = slideUpVariants;
 
-// imageVariants is identical to slideUpVariants
-export const imageVariants = slideUpVariants;
-
 export const buttonVariants = {
   hidden: { y: 20, opacity: 0 },
   visible: {
@@ -49,14 +38,12 @@ export const buttonVariants = {
   },
 };
 
-export const defaultViewport = {
-  once: true,
-  amount: 0.3,
-};
-
 export const sectionMotionProps = {
   initial: "hidden" as const,
   whileInView: "visible" as const,
-  viewport: defaultViewport,
+  viewport: {
+    once: true,
+    amount: 0.3,
+  },
   variants: containerVariants,
 };

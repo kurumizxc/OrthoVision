@@ -1,0 +1,42 @@
+"use client";
+
+import { Toaster } from "react-hot-toast";
+
+/**
+ * Client-side toast notification provider
+ * Extracted from layout to keep root layout as a server component
+ */
+export function ToastProvider() {
+  return (
+    <Toaster
+      position="top-center"
+      toastOptions={{
+        duration: 4000,
+        style: {
+          background: "#363636",
+          color: "#fff",
+        },
+        success: {
+          duration: 3000,
+          iconTheme: {
+            primary: "#4ade80",
+            secondary: "#fff",
+          },
+        },
+        error: {
+          duration: 5000,
+          iconTheme: {
+            primary: "#ef4444",
+            secondary: "#fff",
+          },
+        },
+        loading: {
+          iconTheme: {
+            primary: "#3b82f6",
+            secondary: "#fff",
+          },
+        },
+      }}
+    />
+  );
+}

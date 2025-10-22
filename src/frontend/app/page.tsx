@@ -1,5 +1,5 @@
-import DragDropUpload from "@/components/dragDropUpload"
+import { HomePage } from "@/components/home/HomePage";
 
 export default function Page() {
-  return <DragDropUpload />
+  return <HomePage />;
 }

@@ -1,5 +1,5 @@
 """
-OrthoVision - AI-Powered Fracture Detection Package
+OrthoVision - Fracture Detection Package
 """
 
 from .hybrid_detector import HybridFractureDetector

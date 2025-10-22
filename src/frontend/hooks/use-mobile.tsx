@@ -2,6 +2,10 @@
 
 import * as React from "react"
 
+/**
+ * useIsMobile returns a boolean indicating if the viewport width is below
+ * the mobile breakpoint. Updates reactively on resize via matchMedia.
+ */
 const MOBILE_BREAKPOINT = 768
 
 export function useIsMobile() {

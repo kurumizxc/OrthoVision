@@ -9,6 +9,11 @@ import {
 } from "@/components/ui/sidebar";
 import { RotateCw, Download, Home, Eye, EyeOff } from "lucide-react";
 
+/**
+ * CanvasControls renders sidebar actions for rotate, reset, download,
+ * and toggling detection overlays.
+ */
+
 // Props for CanvasControls component
 interface CanvasControlsProps {
   rotateImage: () => void;

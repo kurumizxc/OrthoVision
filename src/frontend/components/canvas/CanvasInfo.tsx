@@ -5,6 +5,10 @@ import {
   SidebarGroupLabel,
 } from "@/components/ui/sidebar";
 
+/**
+ * CanvasInfo displays current zoom, rotation, and pan values for the stage.
+ */
+
 interface CanvasInfoProps {
   stageScale: number;
   imageRotation: number;

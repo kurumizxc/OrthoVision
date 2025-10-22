@@ -26,19 +26,24 @@ model = HybridFractureDetector(
 
 @app.get("/")
 async def read_root():
+    """Health endpoint to verify the API is running."""
     return {"message": "Hello, World!"}
 
 @app.post("/detect")
 async def detect_fracture(image: UploadFile = File(...)):
     """
-    Endpoint to detect fractures in X-ray images.
-    
+    Detect fractures in an uploaded X-ray image.
+
     Args:
-        image: Uploaded image file (JPEG/PNG)
-    
+        image: Uploaded image file (JPEG/PNG).
+
     Returns:
-        JSON response with classification, confidence, recommendation, original image, 
-        image dimensions, and bounding box detections
+        JSON with:
+        - class: "Fractured" | "Non Fractured"
+        - confidence: formatted percentage string (e.g., "91.23%")
+        - recommendation: follow-up guidance based on classification
+        - imageWidth / imageHeight: dimensions extracted from the uploaded image
+        - detections: list of bounding boxes when fractured and confident enough
     """
     try:
         contents = await image.read()

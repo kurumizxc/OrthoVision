@@ -2,7 +2,7 @@ import type React from "react";
 import "../styles/globals.css";
 import { Inter } from "next/font/google";
 import type { Metadata } from "next";
-import { Toaster } from "react-hot-toast";
+import { ToastProvider } from "@/components/providers/ToastProvider";
 
 // Configure Inter font with Next.js font loader
 const inter = Inter({
@@ -60,37 +60,7 @@ export default function RootLayout({
       </head>
       <body>
         {children}
-        {/* Toast notifications for user feedback */}
-        <Toaster
-          position="top-center"
-          toastOptions={{
-            duration: 4000,
-            style: {
-              background: "#363636",
-              color: "#fff",
-            },
-            success: {
-              duration: 3000,
-              iconTheme: {
-                primary: "#4ade80",
-                secondary: "#fff",
-              },
-            },
-            error: {
-              duration: 5000,
-              iconTheme: {
-                primary: "#ef4444",
-                secondary: "#fff",
-              },
-            },
-            loading: {
-              iconTheme: {
-                primary: "#3b82f6",
-                secondary: "#fff",
-              },
-            },
-          }}
-        />
+        <ToastProvider />
       </body>
     </html>
   );

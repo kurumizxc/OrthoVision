@@ -2,87 +2,76 @@
  * API utilities for communicating with the backend
  */
 
-import type { DetectionResult } from "@/types/image"
+import type { DetectionResult } from "@/types/image";
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
 /**
  * Converts a File, base64 data URL, or regular URL to a FormData object
- * 
+ *
  * @param file - File object, base64 data URL string, or regular URL string
  * @returns Promise resolving to FormData with the image file
  */
 async function prepareFormData(file: File | string): Promise<FormData> {
-  const formData = new FormData()
-  
+  const formData = new FormData();
+
   if (typeof file === "string") {
     if (file.startsWith("data:")) {
       // Handle base64 data URL
-      const base64Data = file.split(",")[1]
-      const mimeType = file.match(/data:(.*?);/)?.[1] || "image/jpeg"
-      const byteCharacters = atob(base64Data)
-      const byteNumbers = new Array(byteCharacters.length)
-      
+      const base64Data = file.split(",")[1];
+      const mimeType = file.match(/data:(.*?);/)?.[1] || "image/jpeg";
+      const byteCharacters = atob(base64Data);
+      const byteNumbers = new Array(byteCharacters.length);
+
       for (let i = 0; i < byteCharacters.length; i++) {
-        byteNumbers[i] = byteCharacters.charCodeAt(i)
+        byteNumbers[i] = byteCharacters.charCodeAt(i);
       }
-      
-      const byteArray = new Uint8Array(byteNumbers)
-      const blob = new Blob([byteArray], { type: mimeType })
-      formData.append("image", blob, "image.jpg")
+
+      const byteArray = new Uint8Array(byteNumbers);
+      const blob = new Blob([byteArray], { type: mimeType });
+      formData.append("image", blob, "image.jpg");
     } else {
       // Handle regular URL - fetch the image first
-      const response = await fetch(file)
+      const response = await fetch(file);
       if (!response.ok) {
-        throw new Error(`Failed to fetch image from ${file}`)
+        throw new Error(`Failed to fetch image from ${file}`);
       }
-      const blob = await response.blob()
-      formData.append("image", blob, "image.jpg")
+      const blob = await response.blob();
+      formData.append("image", blob, "image.jpg");
     }
   } else {
-    formData.append("image", file)
+    formData.append("image", file);
   }
-  
-  return formData
+
+  return formData;
 }
 
 /**
  * Detects fractures in an X-ray image by sending it to the backend
- * 
+ *
  * @param image - File object, base64 data URL string, or regular URL string
  * @returns Detection results including class, confidence, recommendation, and annotated image
  * @throws Error if the request fails
  */
-export async function detectFracture(image: File | string): Promise<DetectionResult> {
-  const formData = await prepareFormData(image)
-  
+export async function detectFracture(
+  image: File | string
+): Promise<DetectionResult> {
+  const formData = await prepareFormData(image);
+
   const response = await fetch(`${API_BASE_URL}/detect`, {
     method: "POST",
     body: formData,
-  })
-  
+  });
+
   if (!response.ok) {
-    const errorData = await response.json().catch(() => ({ error: "Unknown error" }))
-    throw new Error(errorData.error || `Failed to detect fracture: ${response.statusText}`)
+    const errorData = await response
+      .json()
+      .catch(() => ({ error: "Unknown error" }));
+    throw new Error(
+      errorData.error || `Failed to detect fracture: ${response.statusText}`
+    );
   }
-  
-  const result = await response.json()
-  return result as DetectionResult
-}
 
-/**
- * Checks if the backend API is available
- * 
- * @returns True if the API is available, false otherwise
- */
-export async function checkAPIHealth(): Promise<boolean> {
-  try {
-    const response = await fetch(`${API_BASE_URL}/`, {
-      method: "GET",
-    })
-    return response.ok
-  } catch {
-    return false
-  }
+  const result = await response.json();
+  return result as DetectionResult;
 }
-
