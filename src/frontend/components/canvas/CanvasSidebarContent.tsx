@@ -3,7 +3,6 @@
 import { ImageInfo } from "./ImageInfo";
 import { CanvasControls } from "./CanvasControls";
 import { DetectionResults } from "./DetectionResults";
-import { CanvasInfo } from "./CanvasInfo";
 import { useCanvas } from "./CanvasContext";
 
 /**
@@ -41,12 +40,6 @@ export function CanvasSidebarContent() {
       {hasDetectionResult && image.detectionResult && (
         <DetectionResults detectionResult={image.detectionResult} />
       )}
-
-      <CanvasInfo
-        stageScale={stageScale}
-        imageRotation={imageRotation}
-        stagePosition={stagePosition}
-      />
     </>
   );
 }

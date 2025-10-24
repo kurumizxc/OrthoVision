@@ -3,8 +3,7 @@
  */
 
 import type { DetectionResult } from "@/types/image";
-
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+import { API_BASE_URL } from "@/lib/config";
 
 /**
  * Converts a File, base64 data URL, or regular URL to a FormData object

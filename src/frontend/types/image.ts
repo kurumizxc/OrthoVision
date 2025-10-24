@@ -9,6 +9,7 @@ export interface ImageData {
 }
 
 // Api types for detection results and bounding boxes on images - Can be separated if needed
+// Schema for API response
 
 export interface BoundingBox {
   id: number;
