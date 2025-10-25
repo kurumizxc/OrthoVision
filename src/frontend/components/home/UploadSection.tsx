@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import { UploadArea } from "./UploadArea";
@@ -35,8 +35,23 @@ export function UploadSection({
   );
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);
+  const [dots, setDots] = useState("");
   const router = useRouter();
   const fileToBase64 = useFileToBase64();
+
+  useEffect(() => {
+    if (!isUploading) {
+      setDots("");
+      return;
+    }
+    const frames = [".", "..", "..."];
+    let i = 0;
+    const id = setInterval(() => {
+      setDots(frames[i]);
+      i = (i + 1) % frames.length;
+    }, 400);
+    return () => clearInterval(id);
+  }, [isUploading]);
 
   const handleFileAccepted = useCallback(
     (file: File) => {
@@ -136,12 +151,14 @@ export function UploadSection({
         currentImage={currentImage}
         removeFile={removeFile}
         onFileAccepted={handleFileAccepted}
+        isUploading={isUploading}
       />
 
       <SampleImagesGrid
         sampleImages={sampleImages}
         selectedSampleId={selectedSample?.id || null}
         onSelectSample={handleSampleSelect}
+        isUploading={isUploading}
       />
 
       <motion.div
@@ -156,7 +173,7 @@ export function UploadSection({
           disabled={!currentImage || isUploading}
           className="transition-all duration-200 hover:scale-105"
         >
-          {isUploading ? "Uploading..." : "Upload Image"}
+          {isUploading ? `Analyzing${dots}` : "Analyze Image"}
         </Button>
       </motion.div>
     </>

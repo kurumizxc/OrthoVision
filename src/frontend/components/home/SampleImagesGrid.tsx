@@ -14,12 +14,14 @@ interface SampleImagesGridProps {
   sampleImages: SampleImage[];
   selectedSampleId: number | null;
   onSelectSample: (sample: SampleImage) => void;
+  isUploading?: boolean;
 }
 
 export function SampleImagesGrid({
   sampleImages,
   selectedSampleId,
   onSelectSample,
+  isUploading = false,
 }: SampleImagesGridProps) {
   return (
     <motion.div
@@ -43,6 +45,7 @@ export function SampleImagesGrid({
               index={index}
               isSelected={selectedSampleId === sample.id}
               onSelect={onSelectSample}
+              disabled={isUploading}
             />
           ))}
         </div>
@@ -56,6 +59,7 @@ interface SampleImageButtonProps {
   index: number;
   isSelected: boolean;
   onSelect: (sample: SampleImage) => void;
+  disabled?: boolean;
 }
 
 function SampleImageButton({
@@ -63,22 +67,25 @@ function SampleImageButton({
   index,
   isSelected,
   onSelect,
+  disabled = false,
 }: SampleImageButtonProps) {
   // Select this sample when clicked
   const handleClick = useCallback(() => {
+    if (disabled) return;
     onSelect(sample);
-  }, [onSelect, sample]);
+  }, [onSelect, sample, disabled]);
 
   return (
     <motion.button
       type="button"
       variants={slideUpVariants}
       custom={index}
-      className={`relative cursor-pointer overflow-hidden ${
+      className={`relative overflow-hidden ${
         isSelected ? "ring-2 ring-blue-500 rounded-md" : ""
-      }`}
+      } ${disabled ? "opacity-50 grayscale cursor-not-allowed pointer-events-none" : "cursor-pointer"}`}
       onClick={handleClick}
       aria-label={`Select sample image: ${sample.name}`}
+      disabled={disabled}
     >
       <div className="w-16 h-16 bg-gray-200 overflow-hidden relative">
         <Image

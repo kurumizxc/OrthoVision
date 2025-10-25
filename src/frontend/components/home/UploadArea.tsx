@@ -12,6 +12,7 @@ interface UploadAreaProps {
   currentImage: { name: string; size: number } | null;
   removeFile: () => void;
   onFileAccepted: (file: File) => void;
+  isUploading: boolean;
 }
 
 const VALID_IMAGE_TYPES = ["image/jpeg", "image/jpg", "image/png"] as const;
@@ -28,6 +29,7 @@ export function UploadArea({
   currentImage,
   removeFile,
   onFileAccepted,
+  isUploading,
 }: UploadAreaProps) {
   // Handle files dropped/selected through the dropzone input
   const onDrop = useCallback(
@@ -92,6 +94,7 @@ export function UploadArea({
               variant="secondary"
               size="sm"
               onClick={removeFile}
+              disabled={isUploading}
               className="bg-white/80 hover:bg-white"
             >
               <X className="h-4 w-4" />
