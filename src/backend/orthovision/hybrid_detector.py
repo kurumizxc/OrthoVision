@@ -7,24 +7,20 @@ import logging
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
+# Combines a ResNet classifier with a YOLO object detector to analyze X-ray images.
+# Classifies as Fractured/Non Fractured and, when confident and fractured,
+# provides detection boxes for likely fracture regions.
 class HybridFractureDetector:
-    """Combines a ResNet classifier with a YOLO object detector.
-
-    Classifies an X-ray as Fractured/Non Fractured and, when fractured with
-    sufficient confidence, returns bounding boxes highlighting likely areas.
-    """
+    
+    # Load classifier/detector weights and set up preprocessing.
+    # resnet_path: path to .pth classifier weights
+    # yolo_path: path to .pt detector weights
     def __init__(self, resnet_path: str, yolo_path: str):
-        """Load the classifier and detector checkpoints and preprocessing.
-
-        Args:
-            resnet_path: Path to the trained ResNet weights (.pth).
-            yolo_path: Path to the trained YOLO weights (.pt).
-        """
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
         self.detector = None
         self.classifier = None
 
-        # --- Load ResNet Classifier ---
+        #Load ResNet Classifier
         self.classifier = models.resnet18(weights=None)
         self.classifier.conv1 = nn.Conv2d(1, 64, kernel_size=7, stride=2, padding=3, bias=False)
         num_features = self.classifier.fc.in_features
@@ -39,11 +35,11 @@ class HybridFractureDetector:
         self.classifier.to(self.device).eval()
         logging.info(f"Loaded ResNet model from {resnet_path}")
 
-        # --- Load YOLO Detector ---
+        #Load YOLO Detector
         self.detector = YOLO(yolo_path)
         logging.info(f"Loaded YOLO model from {yolo_path}")
 
-        # --- Preprocessing Transform ---
+        #Preprocessing Transform
         self.transform = transforms.Compose([
             transforms.Grayscale(num_output_channels=1),
             transforms.Resize(256),
@@ -52,19 +48,14 @@ class HybridFractureDetector:
             transforms.Normalize(mean=[0.485], std=[0.229])
         ])
 
+    # Run classification on a PIL image and optionally detect fracture boxes.
+    # image: PIL.Image
+    # returns: dict with keys: class, confidence (0..1), detections (list), recommendation (str)
     def process_image(self, image):
-        """Run classification and conditional detection on a PIL image.
-
-        Args:
-            image: PIL.Image instance in any mode.
-
-        Returns:
-            dict with keys: class, confidence (0..1), detections (list), recommendation (str).
-        """
         results = {}
         image = image.convert('RGB')
 
-        # --- Classification ---
+        #Classification
         img_tensor = self.transform(image).unsqueeze(0).to(self.device)
         with torch.no_grad():
             outputs = self.classifier(img_tensor)
@@ -76,7 +67,7 @@ class HybridFractureDetector:
         results['class'] = classification_result
         results['confidence'] = confidence
 
-        # --- YOLO Detection (bounding boxes only) ---
+        #YOLO Detection (bounding boxes only)
         detections = []
         if classification_result == 'Fractured' and confidence >= 0.5:
             yolo_results = self.detector(image, conf=0.25)
@@ -89,10 +80,10 @@ class HybridFractureDetector:
                         "label": f"Fracture Area {i + 1}",
                         "box": [x1, y1, x2, y2]
                     })
-
+        
         results["detections"] = detections
 
-        # --- Recommendation ---
+        #Recommendation
         if classification_result == "Fractured":
             results["recommendation"] = (
                 "Fracture identified on the imaging results. "
@@ -103,5 +94,12 @@ class HybridFractureDetector:
                 "No signs of fracture on the imaging results. "
                 "Please monitor the condition and refer to orthopedics for further evaluation if needed."
             )
-
+        
         return results
+
+# File overview
+# - Defines HybridFractureDetector that loads:
+#   - A ResNet classifier (.pth) for fracture vs non-fracture classification
+#   - A YOLO detector (.pt) to localize fracture regions when classification is positive
+# - Exposes process_image(image) to return class, confidence, detections, and recommendation.
+# - Logging informs when each model is loaded.

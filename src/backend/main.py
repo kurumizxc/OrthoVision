@@ -1,61 +1,61 @@
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi import FastAPI, UploadFile, File
+from fastapi import FastAPI, UploadFile, File, Request
 from fastapi.responses import JSONResponse
 from PIL import Image
 from io import BytesIO
-from orthovision.hybrid_detector import HybridFractureDetector
+from dotenv import load_dotenv
+import os
+from orthovision.load_model import load_model
 
+# Load environment variables from .env (e.g., FRONTEND_URL)
+load_dotenv()
 
-app = FastAPI(title="OrthoVision Backend", version="0.1.0")
+# Create FastAPI app and attach lifespan that loads models on startup
+app = FastAPI(
+    title="OrthoVision Backend",
+    version="0.1.0",
+    lifespan=load_model
+)
 
-# Configure permissive CORS for development. Tighten in production.
+# Configure CORS
+frontend_url = os.getenv("FRONTEND_URL", "http://localhost:3000").strip()
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Replace with specific origins in production
+    allow_origins=[frontend_url],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# --- Load Models Once on Startup ---
-model = HybridFractureDetector(
-    resnet_path="models/best_model_f1_focused.pth",
-    yolo_path="models/best.pt"
-)
-
-
+# Health check endpoint
 @app.get("/")
 async def read_root():
-    """Health endpoint to verify the API is running."""
-    return {"message": "Hello, World!"}
+    return {"message": "OrthoVision backend running successfully!"}
 
+# Model version endpoint
+@app.get("/version")
+async def model_version():
+    """Return current model repo revision if available."""
+    from pathlib import Path
+    import json
+    meta_file = Path("models/model_meta.json")
+    if not meta_file.exists():
+        return {"status": "unknown", "message": "No version metadata found"}
+    return json.loads(meta_file.read_text())
+
+# Fracture detection endpoint
 @app.post("/detect")
-async def detect_fracture(image: UploadFile = File(...)):
-    """
-    Detect fractures in an uploaded X-ray image.
-
-    Args:
-        image: Uploaded image file (JPEG/PNG).
-
-    Returns:
-        JSON with:
-        - class: "Fractured" | "Non Fractured"
-        - confidence: formatted percentage string (e.g., "91.23%")
-        - recommendation: follow-up guidance based on classification
-        - imageWidth / imageHeight: dimensions extracted from the uploaded image
-        - detections: list of bounding boxes when fractured and confident enough
-    """
+async def detect_fracture(request: Request, image: UploadFile = File(...)):
+    # Run fracture detection on an uploaded X-ray image.
     try:
+        # Read uploaded file and open as PIL image
         contents = await image.read()
         pil_image = Image.open(BytesIO(contents))
-
-        # Get image dimensions
+        # Extract dimensions for frontend rendering
         width, height = pil_image.size
-
-        # Process image to get classification and detections
-        result = model.process_image(pil_image)
-
-        # Return only detection data - frontend handles image display
+        # Run inference using the app-scoped model
+        result = request.app.state.model.process_image(pil_image)
         return JSONResponse({
             "class": result["class"],
             "confidence": f"{result['confidence'] * 100:.2f}%",
@@ -64,10 +64,19 @@ async def detect_fracture(image: UploadFile = File(...)):
             "imageHeight": height,
             "detections": result["detections"]
         })
-
     except Exception as e:
+        # Log full traceback for debugging and return 500 error
         import traceback
-        print(f"Error processing image: {str(e)}")
+        print(f"Error processing image: {e}")
         print(traceback.format_exc())
         return JSONResponse(status_code=500, content={"error": str(e)})
 
+# - Loads environment variables (dotenv) and configures CORS using FRONTEND_URL.
+# - Creates the FastAPI application and attaches a lifespan handler that
+#   loads ML models at startup via orthovision.load_model.load_model and
+#   exposes the detector on app.state.model.
+# - Exposes endpoints:
+#   - GET /          : Health check
+#   - GET /version   : Returns current model repo revision metadata (if present)
+#   - POST /detect   : Accepts an image file and returns classification,
+#                      confidence, recommendation, image dimensions, and detections.
