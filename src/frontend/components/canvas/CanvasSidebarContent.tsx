@@ -5,9 +5,7 @@ import { CanvasControls } from "./CanvasControls";
 import { DetectionResults } from "./DetectionResults";
 import { useCanvas } from "./CanvasContext";
 
-/**
- * CanvasSidebarContent organizes all sidebar sections
- */
+
 export function CanvasSidebarContent() {
   const {
     image,
@@ -49,7 +47,6 @@ export function CanvasSidebarContent() {
 }
 
 /**
- * Summary
  * CanvasSidebarContent composes the sidebar by showing image metadata,
  * canvas action controls, and detection results (when available).
  */

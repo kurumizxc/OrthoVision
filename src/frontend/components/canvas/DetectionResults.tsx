@@ -6,10 +6,6 @@ import {
 } from "@/components/ui/sidebar";
 import type { ImageDataWithResult } from "@/types/image";
 
-/**
- * DetectionResults shows classification, confidence, count of detections,
- * and the textual recommendation returned by the backend.
- */
 
 interface DetectionResultsProps {
   detectionResult: NonNullable<ImageDataWithResult["detectionResult"]>;
@@ -57,8 +53,6 @@ export const DetectionResults = memo(function DetectionResults({
 });
 
 /**
- * Summary
- * DetectionResults presents the classification outcome, confidence, optional
- * detection count, and an accompanying recommendation inside a sidebar group.
- * Visual emphasis is applied based on fracture status.
+ * DetectionResults shows classification, confidence, count of detections,
+ * and the textual recommendation returned by the backend.
  */

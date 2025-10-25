@@ -5,10 +5,7 @@ import { useRouter } from "next/navigation";
 import { CanvasEditor } from "./CanvasEditor";
 import type { ImageDataWithResult } from "@/types/image";
 
-/**
- * CanvasPage - Client component that loads image from sessionStorage
- * Redirects to home if no image is available
- */
+
 export function CanvasPage() {
   const [image, setImage] = useState<ImageDataWithResult | null>(null);
   const router = useRouter();
@@ -38,7 +35,6 @@ export function CanvasPage() {
 }
 
 /**
- * Summary
  * Client page that retrieves the uploaded image from sessionStorage.
  * If no image is found, the user is redirected to the home page; otherwise,
  * the CanvasEditor is rendered with the loaded image data.

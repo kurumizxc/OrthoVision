@@ -5,9 +5,6 @@ import {
   SidebarGroupLabel,
 } from "@/components/ui/sidebar";
 
-/**
- * ImageInfo shows basic metadata for the selected image (name, size, type).
- */
 
 interface ImageInfoProps {
   name: string;
@@ -41,7 +38,5 @@ export const ImageInfo = memo(function ImageInfo({
 });
 
 /**
- * Summary
- * ImageInfo displays image name (truncated with tooltip), size in MB,
- * and MIME type inside a sidebar group.
+ * ImageInfo shows basic metadata for the selected image (name, size, type).
  */

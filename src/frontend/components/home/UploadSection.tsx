@@ -13,11 +13,6 @@ import { buttonVariants } from "@/lib/animations";
 import { detectFracture } from "@/lib/api";
 import { useFileToBase64 } from "@/hooks/useFileReader";
 
-/**
- * UploadSection handles file/sample selection, preview, and submit flow
- * Calls backend for detection and navigates to canvas page
- */
-
 interface UploadSectionProps {
   imagePreview: string | null;
   currentImage: { name: string; size: number } | null;

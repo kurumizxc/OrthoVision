@@ -3,9 +3,6 @@
 import { motion } from "motion/react";
 import { itemVariants, sectionMotionProps } from "@/lib/animations";
 
-/**
- * Authors section displaying project contributors
- */
 export function AuthorsSection() {
   return (
     <motion.section
@@ -37,5 +34,5 @@ export function AuthorsSection() {
 }
 
 /**
- * AuthorsSection lists project contributors with simple motion effects.
+ * AuthorsSection lists project contributors
  */

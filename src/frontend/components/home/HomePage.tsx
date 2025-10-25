@@ -13,10 +13,6 @@ import { AuthorsSection } from "./AuthorsSection";
 import { SpecialThanksSection } from "./SpecialThanksSection";
 import { Footer } from "@/components/home/Footer";
 
-/**
- * HomePage is the main landing page component
- * Manages state for file uploads and sample selection
- */
 export function HomePage() {
   const [file, setFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
@@ -98,5 +94,5 @@ export function HomePage() {
 
 /**
  * HomePage manages the landing experience: header, upload flow with preview,
- * optional sample selection, and informational sections with motion effects.
+ * optional sample selection, and informational sections.
  */

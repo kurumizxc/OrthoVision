@@ -3,11 +3,6 @@
 import React, { createContext, useContext } from "react"
 import type { ImageDataWithResult } from "@/types/image"
 
-/**
- * CanvasContext provides image data, view state (zoom/rotation/pan),
- * detection visibility, and related actions to canvas UI consumers.
- */
-
 export interface CanvasContextValue {
   image: ImageDataWithResult
   imageRotation: number
@@ -37,7 +32,6 @@ export const CanvasProvider = CanvasContext.Provider
 export default CanvasContext
 
 /**
- * Summary
  * CanvasContext and related hook/provider definitions for sharing canvas state
  * and actions (zoom/rotation/pan, detection visibility, export) across the app.
  */

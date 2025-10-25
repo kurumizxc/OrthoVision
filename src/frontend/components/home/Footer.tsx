@@ -1,7 +1,3 @@
-/**
- * Footer displays project attribution and a usage disclaimer
- * Server component - no interactivity needed
- */
 export function Footer() {
   return (
     <footer className="pt-4 pb-4 text-center text-sm text-slate-400">

@@ -3,10 +3,6 @@
 import { motion } from "motion/react";
 import { itemVariants } from "@/lib/animations";
 
-/**
- * Animated page header for the landing page
- * Client component due to motion animations
- */
 export function PageHeader() {
   return (
     <motion.header variants={itemVariants} className="text-center">
@@ -19,5 +15,5 @@ export function PageHeader() {
 }
 
 /**
- * PageHeader renders the landing page title and subtitle with motion animation.
+ * PageHeader renders the landing page.
  */

@@ -1,15 +1,12 @@
-/**
- * Types for image payloads and detection results shared between UI and API.
- */
 export interface ImageData {
   name: string;
   size: number;
   type: string;
-  url: string; // Base64 data URL (data:image/...) or public path (/images/...)
+  url: string; // Base64 data URL 
 }
 
-// API types for detection results and bounding boxes on images
-
+// Api types for detection results and bounding boxes on images - Can be separated if needed
+// Schema for API response
 export interface BoundingBox {
   id: number;
   label: string;

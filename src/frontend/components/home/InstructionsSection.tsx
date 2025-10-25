@@ -3,9 +3,6 @@
 import { motion } from "motion/react";
 import { itemVariants, sectionMotionProps } from "@/lib/animations";
 
-/**
- * Instructions section explaining how to use the application
- */
 export function InstructionsSection() {
   return (
     <motion.section

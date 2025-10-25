@@ -1,6 +1,3 @@
-/**
- * Types and sample data for built-in demo images used on the upload page.
- */
 import type { ImageData } from "./image";
 
 export interface SampleImage extends ImageData {

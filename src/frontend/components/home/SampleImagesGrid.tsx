@@ -10,21 +10,11 @@ import {
 } from "@/lib/animations";
 import type { SampleImage } from "@/types/sampleImage";
 
-/**
- * SampleImagesGrid renders a selectable grid of sample images
- * Allows users to quickly try the app without uploading a file
- */
-
 interface SampleImagesGridProps {
   sampleImages: SampleImage[];
   selectedSampleId: number | null;
   onSelectSample: (sample: SampleImage) => void;
 }
-
-/**
- * SampleImagesGrid renders a selectable grid of sample images and buttons that
- * animate into view. It calls back with the chosen sample.
- */
 
 export function SampleImagesGrid({
   sampleImages,
@@ -102,3 +92,8 @@ function SampleImageButton({
     </motion.button>
   );
 }
+
+/**
+ * SampleImagesGrid renders a selectable grid of sample images
+ * Allows users to quickly try the app without uploading a file
+ */

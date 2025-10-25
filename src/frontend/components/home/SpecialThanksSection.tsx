@@ -3,9 +3,6 @@
 import { motion } from "motion/react";
 import { itemVariants, sectionMotionProps } from "@/lib/animations";
 
-/**
- * Special thanks section acknowledging contributors
- */
 export function SpecialThanksSection() {
   return (
     <motion.section
@@ -28,3 +25,7 @@ export function SpecialThanksSection() {
     </motion.section>
   );
 }
+
+/**
+ * Special thanks section acknowledging contributors
+ */

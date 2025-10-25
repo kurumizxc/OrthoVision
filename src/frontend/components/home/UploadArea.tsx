@@ -7,11 +7,6 @@ import { X } from "lucide-react";
 import Image from "next/image";
 import { UploadAnimated } from "@/components/ui/upload";
 
-/**
- * UploadArea provides drag-and-drop and click-to-browse UX
- * Shows a preview when selected and allows clearing the file
- */
-
 interface UploadAreaProps {
   imagePreview: string | null;
   currentImage: { name: string; size: number } | null;
@@ -119,5 +114,5 @@ export function UploadArea({
 
 /**
  * UploadArea provides drag-and-drop and click-to-browse UX, shows a preview
- * when selected, and allows clearing the file. Uses react-dropzone.
+ * when selected, and allows clearing the file.
  */

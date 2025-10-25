@@ -2,15 +2,11 @@
 
 import { Toaster } from "react-hot-toast";
 
-/**
- * Client-side toast notification provider
- * Extracted from layout to keep root layout as a server component
- */
 export function ToastProvider() {
   return (
     <Toaster
-      position="top-center"
-      toastOptions={{
+    position="top-center"
+    toastOptions={{
         duration: 4000,
         style: {
           background: "#363636",
@@ -37,6 +33,11 @@ export function ToastProvider() {
           },
         },
       }}
-    />
+      />
   );
 }
+
+/**
+ * Client-side toast notification provider
+ * Moved as client component from layout to keep root layout as a server component
+ */

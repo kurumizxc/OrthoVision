@@ -9,10 +9,6 @@ import {
 } from "@/components/ui/sidebar";
 import { RotateCw, Download, Home, Eye, EyeOff } from "lucide-react";
 
-/**
- * CanvasControls renders sidebar actions for rotate, reset, download,
- * and toggling detection overlays.
- */
 
 // Props for CanvasControls component
 interface CanvasControlsProps {
@@ -75,8 +71,6 @@ export const CanvasControls = memo(function CanvasControls({
 });
 
 /**
- * Summary
  * CanvasControls lists actionable canvas tools in the sidebar: rotate, reset,
- * download, and show/hide detections (when available). UI is built with the
- * Sidebar components and lucide-react icons, with memoization for performance.
+ * download, and show/hide detections (when available). UI is built with the Sidebar components
  */

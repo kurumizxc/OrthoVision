@@ -1,7 +1,3 @@
-/**
- * API utilities for communicating with the backend
- */
-
 import type { DetectionResult } from "@/types/image";
 import { API_BASE_URL } from "@/lib/config";
 
@@ -11,6 +7,7 @@ import { API_BASE_URL } from "@/lib/config";
  * @param file File object, base64 data URL string, or regular URL string
  * @returns Promise resolving to FormData with the image file
  */
+
 async function prepareFormData(file: File | string): Promise<FormData> {
   const formData = new FormData();
 

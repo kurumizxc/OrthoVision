@@ -453,8 +453,7 @@ export function CanvasEditor({ image }: CanvasEditorProps) {
 }
 
 /**
- * Summary
- * CanvasEditor renders an interactive Konva-powered canvas to view X-ray images.
+ * Renders an interactive Konva-powered canvas to view X-ray images.
  * It supports:
  * - Zooming and panning with mouse wheel and drag
  * - Rotating the image in 90° increments and resetting the view
