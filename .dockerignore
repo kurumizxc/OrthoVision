@@ -1,0 +1,38 @@
+# Exclude everything not needed to build/run the backend
+
+# VCS
+.git
+.gitignore
+
+# Python caches and virtualenvs
+**/__pycache__/
+**/*.pyc
+.venv
+venv
+
+# Node/Frontend
+node_modules
+src/frontend
+
+# Local env and IDE
+.env
+*.log
+.DS_Store
+.vscode
+.idea
+
+# Large model artifacts and datasets
+src/backend/models/*.pt
+src/backend/models/*.pth
+src/backend/models/*.onnx
+src/backend/models/*.bin
+src/backend/models/*.safetensors
+src/backend/models/model_meta.json
+
+# Hugging Face cache
+**/.cache/
+**/huggingface/
+
+# Build outputs
+**/dist
+**/build
