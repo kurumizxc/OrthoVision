@@ -1,5 +1,5 @@
 from contextlib import asynccontextmanager
-from huggingface_hub import hf_hub_download, HfApi
+from huggingface_hub import hf_hub_download
 from orthovision.hybrid_detector import HybridFractureDetector
 from pathlib import Path
 import hashlib
@@ -50,18 +50,51 @@ def clear_old_models():
                 print(f"Could not delete {item}: {e}")
     MODEL_DIR.mkdir(parents=True, exist_ok=True)
 
-# Downloads model file from Hugging Face.
-def download_model(filename: str, hf_token: str):
-    print(f"Downloading {filename} from Hugging Face...")
-    downloaded = hf_hub_download(
+# Downloads model file to the models directory (no symlinks, no cache indirection).
+def download_model(filename: str, hf_token: str) -> Path:
+    print(f"Downloading {filename} from Hugging Face into {MODEL_DIR} ...")
+    MODEL_DIR.mkdir(parents=True, exist_ok=True)
+    # Place the file directly under MODEL_DIR to match expected paths
+    downloaded_path = hf_hub_download(
         repo_id=HF_REPO_ID,
         filename=filename,
-        cache_dir=MODEL_DIR,
-        token=hf_token
+        local_dir=str(MODEL_DIR),
+        token=hf_token,
     )
     local_path = MODEL_DIR / filename
-    os.rename(downloaded, local_path)
-    print(f"Downloaded {filename}")
+
+    # Ensure the file ends up exactly at models/<filename>
+    downloaded_path = Path(downloaded_path)
+    if downloaded_path.exists() and downloaded_path != local_path:
+        try:
+            local_path.parent.mkdir(parents=True, exist_ok=True)
+            shutil.move(str(downloaded_path), str(local_path))
+        except Exception as move_err:
+            print(f"Move failed ({move_err}), attempting copy/remove fallback...")
+            try:
+                shutil.copy2(str(downloaded_path), str(local_path))
+                try:
+                    downloaded_path.unlink()
+                except Exception:
+                    pass
+            except Exception as copy_err:
+                print(f"Copy fallback also failed: {copy_err}")
+
+    # As a last resort, search recursively for the file within MODEL_DIR
+    if not local_path.exists():
+        print(f"Expected path not found: {local_path}. Searching recursively in {MODEL_DIR}...")
+        found = _find_file_recursively(MODEL_DIR, filename)
+        if found:
+            try:
+                shutil.move(str(found), str(local_path))
+            except Exception as e:
+                print(f"Could not move found file {found} to {local_path}: {e}")
+
+    if not local_path.exists():
+        _debug_list_dir(MODEL_DIR)
+        raise FileNotFoundError(f"After download, expected file missing: {local_path}")
+
+    print(f"Downloaded {filename} -> {local_path}")
     return local_path
 
 # Ensure models exist and are up-to-date.
@@ -69,28 +102,34 @@ def download_model(filename: str, hf_token: str):
 # download fresh copies and clear old cache.
 def ensure_latest_models(hf_token: str | None = None) -> tuple[Path, Path]:
     MODEL_DIR.mkdir(parents=True, exist_ok=True)
-    api = HfApi()
-    print(f"Checking Hugging Face repo: {HF_REPO_ID}")
-    repo_info = api.repo_info(repo_id=HF_REPO_ID, token=hf_token)
-    current_revision = repo_info.sha
-    saved_revision = load_meta()
-
-    refresh_required = saved_revision != current_revision
 
     resnet_path = MODEL_DIR / RESNET_FILE
     yolo_path = MODEL_DIR / YOLO_FILE
 
-    if refresh_required or not resnet_path.exists() or not yolo_path.exists():
-        clear_old_models()
-        resnet_path = download_model(RESNET_FILE, hf_token)
-        yolo_path = download_model(YOLO_FILE, hf_token)
-        save_meta(current_revision)
-        print("Updated to latest model version.")
+    # Skip revision check: only download if files are missing
+    if not resnet_path.exists() or not yolo_path.exists():
+        print("One or more model files are missing locally. Downloading required files...")
+        try:
+            if not resnet_path.exists():
+                resnet_path = download_model(RESNET_FILE, hf_token)
+            if not yolo_path.exists():
+                yolo_path = download_model(YOLO_FILE, hf_token)
+        except Exception as e:
+            print(f"Warning: Could not download missing models from Hugging Face: {e}")
+            # If download failed and files are still missing, abort with clear error
+            if not resnet_path.exists() or not yolo_path.exists():
+                raise RuntimeError(
+                    "Models not found locally and Hugging Face download failed. "
+                    "Ensure HF_TOKEN is set (if repo is private) or pre-populate 'src/backend/models' with required files."
+                )
     else:
-        print("Local models are up-to-date with Hugging Face.")
+        print("Found existing model files locally. Skipping download.")
 
-    print(f"ResNet SHA256: {file_hash(resnet_path)[:12]}...")
-    print(f"YOLO SHA256:   {file_hash(yolo_path)[:12]}...")
+    # Final existence check (no hashing to keep startup light)
+    if not resnet_path.exists():
+        raise FileNotFoundError(f"Missing model file: {resnet_path}")
+    if not yolo_path.exists():
+        raise FileNotFoundError(f"Missing model file: {yolo_path}")
 
     return resnet_path, yolo_path
 
@@ -112,7 +151,7 @@ async def load_model(app):
         yolo_path=str(yolo_path)
     )
 
-    print("Models loaded and verified successfully!\n")
+    print("Models loaded successfully!\n")
 
     try:
         yield
@@ -122,7 +161,6 @@ async def load_model(app):
         print("Models unloaded. Backend shutting down.")
 
 # - Syncs model artifacts from Hugging Face (repo revision-aware cache refresh).
-# - Verifies files via SHA256 and stores the current revision in models/model_meta.json.
 # - Provides a FastAPI lifespan context manager that loads HybridFractureDetector
 #   and exposes it on app.state.model, and cleans it up on shutdown.
 # - Environment:

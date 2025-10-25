@@ -33,17 +33,6 @@ app.add_middleware(
 async def read_root():
     return {"message": "OrthoVision backend running successfully!"}
 
-# Model version endpoint
-@app.get("/version")
-async def model_version():
-    """Return current model repo revision if available."""
-    from pathlib import Path
-    import json
-    meta_file = Path("models/model_meta.json")
-    if not meta_file.exists():
-        return {"status": "unknown", "message": "No version metadata found"}
-    return json.loads(meta_file.read_text())
-
 # Fracture detection endpoint
 @app.post("/detect")
 async def detect_fracture(request: Request, image: UploadFile = File(...)):
@@ -77,6 +66,5 @@ async def detect_fracture(request: Request, image: UploadFile = File(...)):
 #   exposes the detector on app.state.model.
 # - Exposes endpoints:
 #   - GET /          : Health check
-#   - GET /version   : Returns current model repo revision metadata (if present)
 #   - POST /detect   : Accepts an image file and returns classification,
 #                      confidence, recommendation, image dimensions, and detections.
