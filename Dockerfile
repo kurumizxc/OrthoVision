@@ -30,4 +30,4 @@ ENV PORT=8000
 
 # Start the FastAPI app
 # Using shell form to allow ${PORT} expansion on Railway
-CMD uvicorn main:app --host 0.0.0.0 --port ${PORT:-8000}
+CMD uvicorn main:app --host 0.0.0.0 --port ${PORT:-8000} --proxy-headers --forwarded-allow-ips="*" --log-level info --access-log
