@@ -14,6 +14,7 @@ export function CanvasPage() {
   const router = useRouter();
 
   useEffect(() => {
+    // Load image from session and redirect home if missing
     const stored = sessionStorage.getItem("uploadedImage");
     if (stored) {
       setImage(JSON.parse(stored) as ImageDataWithResult);
@@ -35,3 +36,10 @@ export function CanvasPage() {
 
   return <CanvasEditor image={image} />;
 }
+
+/**
+ * Summary
+ * Client page that retrieves the uploaded image from sessionStorage.
+ * If no image is found, the user is redirected to the home page; otherwise,
+ * the CanvasEditor is rendered with the loaded image data.
+ */

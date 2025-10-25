@@ -55,3 +55,10 @@ export const DetectionResults = memo(function DetectionResults({
     </SidebarGroup>
   );
 });
+
+/**
+ * Summary
+ * DetectionResults presents the classification outcome, confidence, optional
+ * detection count, and an accompanying recommendation inside a sidebar group.
+ * Visual emphasis is applied based on fracture status.
+ */

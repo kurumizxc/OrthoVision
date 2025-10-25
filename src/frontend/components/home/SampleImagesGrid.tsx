@@ -21,6 +21,11 @@ interface SampleImagesGridProps {
   onSelectSample: (sample: SampleImage) => void;
 }
 
+/**
+ * SampleImagesGrid renders a selectable grid of sample images and buttons that
+ * animate into view. It calls back with the chosen sample.
+ */
+
 export function SampleImagesGrid({
   sampleImages,
   selectedSampleId,
@@ -69,6 +74,7 @@ function SampleImageButton({
   isSelected,
   onSelect,
 }: SampleImageButtonProps) {
+  // Select this sample when clicked
   const handleClick = useCallback(() => {
     onSelect(sample);
   }, [onSelect, sample]);

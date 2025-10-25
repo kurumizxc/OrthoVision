@@ -21,6 +21,7 @@ interface UploadAreaProps {
 
 const VALID_IMAGE_TYPES = ["image/jpeg", "image/jpg", "image/png"] as const;
 
+// Validate that the dropped/selected file is one of the allowed image types
 const isValidImageType = (file: File): boolean => {
   return VALID_IMAGE_TYPES.includes(
     file.type as (typeof VALID_IMAGE_TYPES)[number]
@@ -33,6 +34,7 @@ export function UploadArea({
   removeFile,
   onFileAccepted,
 }: UploadAreaProps) {
+  // Handle files dropped/selected through the dropzone input
   const onDrop = useCallback(
     (acceptedFiles: File[]) => {
       if (acceptedFiles.length > 0) {
@@ -47,6 +49,7 @@ export function UploadArea({
     [onFileAccepted]
   );
 
+  // Configure react-dropzone to accept only images, single file
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
     accept: {
@@ -113,3 +116,8 @@ export function UploadArea({
     </div>
   );
 }
+
+/**
+ * UploadArea provides drag-and-drop and click-to-browse UX, shows a preview
+ * when selected, and allows clearing the file. Uses react-dropzone.
+ */

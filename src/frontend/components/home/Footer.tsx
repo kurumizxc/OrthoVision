@@ -15,3 +15,7 @@ export function Footer() {
     </footer>
   );
 }
+
+/**
+ * Footer shows attribution and an educational-use disclaimer.
+ */

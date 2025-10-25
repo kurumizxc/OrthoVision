@@ -21,13 +21,16 @@ export function CanvasSidebarContent() {
     toggleBoundingBoxes,
   } = useCanvas();
 
+  // Flags derived from detection result
   const hasDetectionResult = !!image.detectionResult;
   const hasDetections = (image.detectionResult?.detections?.length || 0) > 0;
 
   return (
     <>
+      {/* Basic image metadata */}
       <ImageInfo name={image.name} size={image.size} type={image.type} />
 
+      {/* Canvas action controls */}
       <CanvasControls
         rotateImage={rotateImage}
         resetView={resetView}
@@ -37,9 +40,16 @@ export function CanvasSidebarContent() {
         hasDetections={hasDetections}
       />
 
+      {/* Detection summary details */}
       {hasDetectionResult && image.detectionResult && (
         <DetectionResults detectionResult={image.detectionResult} />
       )}
     </>
   );
 }
+
+/**
+ * Summary
+ * CanvasSidebarContent composes the sidebar by showing image metadata,
+ * canvas action controls, and detection results (when available).
+ */

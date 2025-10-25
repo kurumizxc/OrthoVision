@@ -35,3 +35,7 @@ export function AuthorsSection() {
     </motion.section>
   );
 }
+
+/**
+ * AuthorsSection lists project contributors with simple motion effects.
+ */

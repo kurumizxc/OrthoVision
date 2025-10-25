@@ -55,6 +55,7 @@ export const CanvasControls = memo(function CanvasControls({
               Download Image
             </SidebarMenuButton>
           </SidebarMenuItem>
+          {/* Toggle bounding boxes only when detections exist */}
           {hasDetections && (
             <SidebarMenuItem>
               <SidebarMenuButton onClick={toggleBoundingBoxes}>
@@ -72,3 +73,10 @@ export const CanvasControls = memo(function CanvasControls({
     </SidebarGroup>
   );
 });
+
+/**
+ * Summary
+ * CanvasControls lists actionable canvas tools in the sidebar: rotate, reset,
+ * download, and show/hide detections (when available). UI is built with the
+ * Sidebar components and lucide-react icons, with memoization for performance.
+ */

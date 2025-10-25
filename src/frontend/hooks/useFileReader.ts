@@ -1,9 +1,5 @@
 import { useCallback } from "react";
 
-/**
- * useFileToBase64 returns a memoized function that converts a File
- * to a data URL string for client-side previews and uploads.
- */
 export function useFileToBase64() {
   return useCallback((file: File): Promise<string> => {
     return new Promise((resolve, reject) => {
@@ -21,3 +17,8 @@ export function useFileToBase64() {
     });
   }, []);
 }
+
+/**
+ * useFileToBase64 returns a memoized function that converts a File
+ * to a data URL string for client-side previews and uploads.
+ */

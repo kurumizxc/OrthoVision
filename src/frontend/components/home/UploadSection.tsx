@@ -105,6 +105,10 @@ export function UploadSection({
     router.push("/canvas");
   }, [currentImage, uploadedFile, selectedSample, router, fileToBase64]);
 
+  /**
+   * Submit handler that validates selection, triggers processUpload,
+   * and manages toast notifications and uploading state.
+   */
   const handleSubmit = useCallback(async () => {
     if (!currentImage) {
       toast.error("Please select an image to upload.");
@@ -163,3 +167,9 @@ export function UploadSection({
     </>
   );
 }
+
+/**
+ * UploadSection handles file or sample selection, preview display, and submission
+ * to the backend for analysis. Persists the result to sessionStorage and navigates
+ * to the canvas page on success.
+ */

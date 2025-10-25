@@ -8,8 +8,7 @@ export interface ImageData {
   url: string; // Base64 data URL (data:image/...) or public path (/images/...)
 }
 
-// Api types for detection results and bounding boxes on images - Can be separated if needed
-// Schema for API response
+// API types for detection results and bounding boxes on images
 
 export interface BoundingBox {
   id: number;
@@ -29,3 +28,8 @@ export interface DetectionResult {
 export interface ImageDataWithResult extends ImageData {
   detectionResult?: DetectionResult;
 }
+
+/**
+ * Image and detection type contracts shared across UI and API, including
+ * raw image metadata, detection result shape, and optional enrichment.
+ */

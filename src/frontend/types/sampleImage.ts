@@ -7,6 +7,7 @@ export interface SampleImage extends ImageData {
   id: number;
 }
 
+// Demo images used on the upload page when the user picks a sample
 export const SAMPLE_IMAGES: SampleImage[] = [
   {
     id: 1,
@@ -37,3 +38,8 @@ export const SAMPLE_IMAGES: SampleImage[] = [
     type: "image/jpeg",
   },
 ];
+
+/**
+ * SampleImage extends basic image metadata with an identifier and provides
+ * a small in-app dataset for quick demos on the upload page.
+ */

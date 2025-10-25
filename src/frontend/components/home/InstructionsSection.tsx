@@ -38,3 +38,7 @@ export function InstructionsSection() {
     </motion.section>
   );
 }
+
+/**
+ * InstructionsSection explains how to use the application through short steps.
+ */

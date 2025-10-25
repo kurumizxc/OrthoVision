@@ -36,12 +36,14 @@ export function CanvasEditor({ image }: CanvasEditorProps) {
   const displayImageUrlRef = useRef<string>(image.url);
   const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
 
+  // Debounced setter for stage scale and position to avoid excessive re-renders during zoom/pan
   const updateCanvasState = useCallback(
     (scale: number, position: { x: number; y: number }) => {
       if (debounceTimerRef.current) {
         clearTimeout(debounceTimerRef.current);
       }
 
+      // Set new timer to update state after 150ms
       debounceTimerRef.current = setTimeout(() => {
         setStageScale(scale);
         setStagePosition(position);
@@ -50,6 +52,7 @@ export function CanvasEditor({ image }: CanvasEditorProps) {
     []
   );
 
+  // Cleanup any pending debounce timer on unmount
   useEffect(() => {
     return () => {
       if (debounceTimerRef.current) {
@@ -58,6 +61,9 @@ export function CanvasEditor({ image }: CanvasEditorProps) {
     };
   }, []);
 
+  /**
+   * Preload the image URL and only render the canvas once the image is ready
+   */
   useEffect(() => {
     let isMounted = true;
     setIsImageReady(false);
@@ -87,6 +93,17 @@ export function CanvasEditor({ image }: CanvasEditorProps) {
   const originalImageWidth = image.detectionResult?.imageWidth || 0;
   const originalImageHeight = image.detectionResult?.imageHeight || 0;
 
+  /**
+   * Draw bounding boxes and labels over the displayed image.
+   * The boxes are placed within a group that mirrors the image node's transform
+   * so that rotation and positioning stay in sync.
+   *
+   * @param layer Konva layer to draw the boxes on
+   * @param boxes Array of detections with bounding boxes and labels
+   * @param imageNode Konva image node to align the overlay with
+   * @param scaleX Scale factor from original image width to displayed width
+   * @param scaleY Scale factor from original image height to displayed height
+   */
   const drawBoundingBoxes = (
     layer: Konva.Layer,
     boxes: BoundingBox[],
@@ -142,6 +159,11 @@ export function CanvasEditor({ image }: CanvasEditorProps) {
     layer.batchDraw();
   };
 
+  /**
+   * Initialize the Konva stage and layers, render the image, attach zoom/pan handlers,
+   * and draw detection overlays. Cleans up listeners and destroys the stage on unmount
+   * or when dependencies change.
+   */
   useEffect(() => {
     if (!containerRef.current || !isImageReady) return;
 
@@ -282,6 +304,7 @@ export function CanvasEditor({ image }: CanvasEditorProps) {
     updateCanvasState,
   ]);
 
+  // Show/hide the bounding box overlay layer when toggled
   useEffect(() => {
     if (boxLayerRef.current) {
       boxLayerRef.current.visible(showBoundingBoxes);
@@ -289,6 +312,10 @@ export function CanvasEditor({ image }: CanvasEditorProps) {
     }
   }, [showBoundingBoxes]);
 
+  /**
+   * Rotate the image (and overlay group, if present) by +90 degrees each time.
+   * Keeps the rotation state in sync and requests layer redraws.
+   */
   const rotateImage = useCallback(() => {
     const imageNode = imageNodeRef.current;
     const boxGroup = boxGroupRef.current;
@@ -306,6 +333,10 @@ export function CanvasEditor({ image }: CanvasEditorProps) {
     boxLayerRef.current?.batchDraw();
   }, [imageRotation]);
 
+  /**
+   * Reset the canvas view to defaults: no zoom/pan, no rotation,
+   * and recenter the image (and overlay group) within the container.
+   */
   const resetView = useCallback(() => {
     const stage = stageRef.current;
     const imageNode = imageNodeRef.current;
@@ -342,6 +373,10 @@ export function CanvasEditor({ image }: CanvasEditorProps) {
     boxLayerRef.current?.batchDraw();
   }, []);
 
+  /**
+   * Export the currently visible image region (matching the image bounds) as a PNG
+   * and trigger a client-side download with a descriptive filename.
+   */
   const downloadCanvas = useCallback(() => {
     const stage = stageRef.current;
     const imageNode = imageNodeRef.current;
@@ -367,6 +402,7 @@ export function CanvasEditor({ image }: CanvasEditorProps) {
     link.click();
   }, [image.detectionResult?.class]);
 
+  // Toggle the visibility of bounding boxes
   const toggleBoundingBoxes = useCallback(() => {
     setShowBoundingBoxes((prev) => !prev);
   }, []);
@@ -415,3 +451,16 @@ export function CanvasEditor({ image }: CanvasEditorProps) {
     </div>
   );
 }
+
+/**
+ * Summary
+ * CanvasEditor renders an interactive Konva-powered canvas to view X-ray images.
+ * It supports:
+ * - Zooming and panning with mouse wheel and drag
+ * - Rotating the image in 90° increments and resetting the view
+ * - Drawing and toggling detection bounding boxes aligned to the image
+ * - Exporting the visible image region as a PNG
+ * - Responsive resizing and debounced state updates for smooth UX
+ *
+ * The component exposes controls via CanvasProvider for sidebar actions.
+ */

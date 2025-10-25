@@ -32,3 +32,7 @@ export function AboutSection() {
     </motion.section>
   );
 }
+
+/**
+ * AboutSection presents a brief description of OrthoVision and its purpose.
+ */

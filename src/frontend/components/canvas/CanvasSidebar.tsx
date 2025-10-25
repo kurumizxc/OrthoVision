@@ -20,6 +20,7 @@ export function CanvasSidebar() {
   useCanvas();
   const router = useRouter();
 
+  // Navigate back to the home page
   const handleBackClick = useCallback(() => {
     router.push("/");
   }, [router]);
@@ -43,3 +44,10 @@ export function CanvasSidebar() {
     </Sidebar>
   );
 }
+
+/**
+ * Summary
+ * CanvasSidebar renders navigation and canvas controls using the app's Sidebar UI.
+ * It ensures CanvasContext is available, provides a back button to return home,
+ * and displays CanvasSidebarContent for editor actions.
+ */

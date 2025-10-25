@@ -20,6 +20,7 @@ export const ImageInfo = memo(function ImageInfo({
   size,
   type,
 }: ImageInfoProps) {
+  // Truncate long names for layout while preserving title tooltip
   const displayName = name.length > 12 ? `${name.substring(0, 12)}...` : name;
   const sizeInMB = (size / 1024 / 1024).toFixed(2);
 
@@ -38,3 +39,9 @@ export const ImageInfo = memo(function ImageInfo({
     </SidebarGroup>
   );
 });
+
+/**
+ * Summary
+ * ImageInfo displays image name (truncated with tooltip), size in MB,
+ * and MIME type inside a sidebar group.
+ */

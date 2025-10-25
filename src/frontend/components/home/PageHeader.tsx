@@ -17,3 +17,7 @@ export function PageHeader() {
     </motion.header>
   );
 }
+
+/**
+ * PageHeader renders the landing page title and subtitle with motion animation.
+ */

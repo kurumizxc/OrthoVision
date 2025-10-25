@@ -6,9 +6,9 @@ import type { DetectionResult } from "@/types/image";
 import { API_BASE_URL } from "@/lib/config";
 
 /**
- * Converts a File, base64 data URL, or regular URL to a FormData object
+ * Converts a File, base64 data URL, or regular URL to a FormData object.
  *
- * @param file - File object, base64 data URL string, or regular URL string
+ * @param file File object, base64 data URL string, or regular URL string
  * @returns Promise resolving to FormData with the image file
  */
 async function prepareFormData(file: File | string): Promise<FormData> {
@@ -16,7 +16,7 @@ async function prepareFormData(file: File | string): Promise<FormData> {
 
   if (typeof file === "string") {
     if (file.startsWith("data:")) {
-      // Handle base64 data URL
+      // Base64 data URL -> decode and append as Blob
       const base64Data = file.split(",")[1];
       const mimeType = file.match(/data:(.*?);/)?.[1] || "image/jpeg";
       const byteCharacters = atob(base64Data);
@@ -30,7 +30,7 @@ async function prepareFormData(file: File | string): Promise<FormData> {
       const blob = new Blob([byteArray], { type: mimeType });
       formData.append("image", blob, "image.jpg");
     } else {
-      // Handle regular URL - fetch the image first
+      // Regular URL -> fetch image and append as Blob
       const response = await fetch(file);
       if (!response.ok) {
         throw new Error(`Failed to fetch image from ${file}`);
@@ -39,6 +39,7 @@ async function prepareFormData(file: File | string): Promise<FormData> {
       formData.append("image", blob, "image.jpg");
     }
   } else {
+    // File object -> append directly
     formData.append("image", file);
   }
 
@@ -74,3 +75,7 @@ export async function detectFracture(
   const result = await response.json();
   return result as DetectionResult;
 }
+
+/**
+ * detectFracture posts an image to the backend and returns its detection result.
+ */

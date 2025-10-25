@@ -11,6 +11,7 @@ export const slideUpVariants = {
   },
 };
 
+// Parent variant that staggers child animations
 export const containerVariants = {
   hidden: { opacity: 0 },
   visible: {
@@ -22,6 +23,7 @@ export const containerVariants = {
   },
 };
 
+// Reuse slide-up for individual items
 export const itemVariants = slideUpVariants;
 
 export const buttonVariants = {
@@ -38,6 +40,7 @@ export const buttonVariants = {
   },
 };
 
+// Convenience props for sections that animate on scroll into view
 export const sectionMotionProps = {
   initial: "hidden" as const,
   whileInView: "visible" as const,
@@ -47,3 +50,8 @@ export const sectionMotionProps = {
   },
   variants: containerVariants,
 };
+
+/**
+ * Animation variants and helpers for motion components: slide-up items,
+ * staggered containers, delayed buttons, and on-view section props.
+ */

@@ -25,6 +25,7 @@ export function HomePage() {
   );
   const fileToBase64 = useFileToBase64();
 
+  // Handle a newly accepted file: store, build preview, clear sample selection
   const handleFileAccepted = useCallback(
     async (acceptedFile: File) => {
       setFile(acceptedFile);
@@ -41,12 +42,14 @@ export function HomePage() {
     [fileToBase64]
   );
 
+  // Select a sample image and clear any uploaded file
   const handleSampleSelect = useCallback((sample: SampleImage) => {
     setSelectedSample(sample);
     setImagePreview(sample.url);
     setFile(null);
   }, []);
 
+  // Remove current image selection and preview
   const removeFile = useCallback(() => {
     setFile(null);
     setImagePreview(null);
@@ -92,3 +95,8 @@ export function HomePage() {
     </div>
   );
 }
+
+/**
+ * HomePage manages the landing experience: header, upload flow with preview,
+ * optional sample selection, and informational sections with motion effects.
+ */
