@@ -6,7 +6,6 @@ A full‑stack application for X‑ray fracture detection.
 - Backend: FastAPI, Uvicorn, Pillow, OpenCV, PyTorch, Ultralytics YOLO
 - Models: Pulled from Hugging Face at startup
 
-
 ## Project Structure
 
 ```
@@ -22,19 +21,18 @@ OrthoVision/
 └─ README.md
 ```
 
-
 ## Prerequisites
 
 - Node.js 18+ and pnpm/npm/yarn
 - Python 3.10+
 - (Optional) Hugging Face access token if the model repo is private
 
-
 ## Environment Variables
 
 Create separate `.env` files for frontend and backend.
 
 - Frontend (src/frontend/.env.local)
+
   - `NEXT_PUBLIC_API_URL` (default used by code if not set: `http://localhost:8000`)
 
 - Backend (project root or src/backend/.env)
@@ -42,9 +40,9 @@ Create separate `.env` files for frontend and backend.
   - `HF_TOKEN` (required if the Hugging Face repo is private)
 
 Notes:
+
 - The backend will allow CORS from `FRONTEND_URL`.
 - On startup, the backend fetches model artifacts from Hugging Face and caches the latest revision.
-
 
 ## Setup & Run
 
@@ -72,7 +70,6 @@ uvicorn main:app
 
 The API will be available at `http://localhost:8000`.
 
-
 ### 2) Frontend (Next.js)
 
 From `src/frontend`:
@@ -91,7 +88,6 @@ npm run dev
 
 The app will be available at `http://localhost:3000`.
 
-
 ## API
 
 Base URL: `http://<backend-host>:8000`
@@ -101,9 +97,11 @@ Base URL: `http://<backend-host>:8000`
 - `POST /detect` — Detect fracture from an uploaded image
 
 Request (multipart/form-data):
+
 - field: `image` (file or blob)
 
 Response (200):
+
 ```json
 {
   "class": "Fractured" | "Non Fractured",
@@ -119,25 +117,24 @@ Response (200):
 
 Errors (4xx/5xx): `{ "error": "message" }`
 
-
 ## Development Notes
 
 - The backend loads and exposes the detector on `app.state.model` during app lifespan.
 - Models are stored under `src/backend/models/` and refreshed when the remote revision changes.
 - Frontend reads the API base from `NEXT_PUBLIC_API_URL` via `src/frontend/lib/config.ts`.
 
-
 ## Scripts
 
 Frontend (from `src/frontend`):
+
 - `npm run dev` — Start Next.js dev server
 - `npm run build` — Build for production
 - `npm start` — Start production server
 - `npm run lint` — Lint
 
-Backend (from project root):
-- `uvicorn main:app
+Backend (from `src/backend`):
 
+- `uvicorn main:app`
 
 ## License
 
