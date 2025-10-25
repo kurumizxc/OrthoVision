@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback } from "react";
+import { useCallback, memo } from "react";
 import { useDropzone } from "react-dropzone";
 import { Button } from "@/components/ui/button";
 import { X } from "lucide-react";
@@ -24,7 +24,7 @@ const isValidImageType = (file: File): boolean => {
   );
 };
 
-export function UploadArea({
+function UploadAreaComponent({
   imagePreview,
   currentImage,
   removeFile,
@@ -54,6 +54,7 @@ export function UploadArea({
       "image/png": [".png"],
     },
     multiple: false,
+    disabled: isUploading,
   });
 
   return (
@@ -61,11 +62,15 @@ export function UploadArea({
       {!imagePreview ? (
         <div
           {...getRootProps()}
-          className={`relative rounded-lg text-center transition-colors cursor-pointer h-64 w-64 flex flex-col items-center justify-center mx-auto ${
-            isDragActive ? "bg-blue-50" : "bg-gray-100 hover:bg-gray-200"
+          className={`relative rounded-lg text-center transition-colors h-64 w-64 flex flex-col items-center justify-center mx-auto ${
+            isUploading
+              ? "bg-gray-100 opacity-60 cursor-not-allowed"
+              : isDragActive
+              ? "bg-blue-50 cursor-pointer"
+              : "bg-gray-100 hover:bg-gray-200 cursor-pointer"
           }`}
         >
-          <input {...getInputProps()} />
+          <input {...getInputProps()} aria-disabled={isUploading} />
           <div>
             <UploadAnimated
               width={48}
@@ -114,6 +119,8 @@ export function UploadArea({
     </div>
   );
 }
+
+export const UploadArea = memo(UploadAreaComponent);
 
 /**
  * UploadArea provides drag-and-drop and click-to-browse UX, shows a preview

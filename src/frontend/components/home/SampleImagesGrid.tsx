@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { motion } from "motion/react";
-import { useCallback } from "react";
+import { useCallback, memo } from "react";
 import {
   containerVariants,
   itemVariants,
@@ -17,7 +17,9 @@ interface SampleImagesGridProps {
   isUploading?: boolean;
 }
 
-export function SampleImagesGrid({
+export const SampleImagesGrid = memo(SampleImagesGridComponent);
+
+function SampleImagesGridComponent({
   sampleImages,
   selectedSampleId,
   onSelectSample,
@@ -62,7 +64,7 @@ interface SampleImageButtonProps {
   disabled?: boolean;
 }
 
-function SampleImageButton({
+const SampleImageButton = memo(function SampleImageButton({
   sample,
   index,
   isSelected,
@@ -98,7 +100,7 @@ function SampleImageButton({
       </div>
     </motion.button>
   );
-}
+});
 
 /**
  * SampleImagesGrid renders a selectable grid of sample images

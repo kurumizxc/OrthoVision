@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { motion } from "motion/react";
 import { containerVariants, itemVariants } from "@/lib/animations";
 import { SAMPLE_IMAGES, type SampleImage } from "@/types/sampleImage";
@@ -20,6 +20,13 @@ export function HomePage() {
     null
   );
   const fileToBase64 = useFileToBase64();
+
+  // Ensure fresh state on landing/reload/back-forward by clearing any persisted data
+  useEffect(() => {
+    try {
+      sessionStorage.removeItem("uploadedImage");
+    } catch {}
+  }, []);
 
   // Handle a newly accepted file: store, build preview, clear sample selection
   const handleFileAccepted = useCallback(
