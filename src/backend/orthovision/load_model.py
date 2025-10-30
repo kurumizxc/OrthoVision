@@ -2,39 +2,15 @@ from contextlib import asynccontextmanager
 from huggingface_hub import hf_hub_download
 from orthovision.hybrid_detector import HybridFractureDetector
 from pathlib import Path
-import hashlib
+
 import shutil
 import os
-import json
 
 # Model directory and Hugging Face repository configuration.
 MODEL_DIR = Path(__file__).resolve().parent.parent / "models"
 HF_REPO_ID = "kurumizxc/orthovision-models"  # Replace with private repo
 RESNET_FILE = "best_model_f1_focused.pth"
 YOLO_FILE = "best.pt"
-META_FILE = MODEL_DIR / "model_meta.json"
-
-# Helper functions for model management.
-def file_hash(path: Path) -> str:
-    # Compute SHA256 hash for a file.
-    sha256 = hashlib.sha256()
-    with open(path, "rb") as f:
-        for chunk in iter(lambda: f.read(8192), b""):
-            sha256.update(chunk)
-    return sha256.hexdigest()
-
-# Save and load model metadata.
-def save_meta(repo_revision: str):
-    META_FILE.write_text(json.dumps({"revision": repo_revision}))
-
-# Load stored revision hash.
-def load_meta() -> str | None:
-    if META_FILE.exists():
-        try:
-            return json.loads(META_FILE.read_text()).get("revision")
-        except Exception:
-            return None
-    return None
 
 # Clear local model directory before redownloading new ones.
 def clear_old_models():
@@ -160,7 +136,6 @@ async def load_model(app):
             del app.state.model
         print("Models unloaded. Backend shutting down.")
 
-# - Syncs model artifacts from Hugging Face (repo revision-aware cache refresh).
 # - Provides a FastAPI lifespan context manager that loads HybridFractureDetector
 #   and exposes it on app.state.model, and cleans it up on shutdown.
 # - Environment:

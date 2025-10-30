@@ -40,7 +40,7 @@ export const DetectionResults = memo(function DetectionResults({
           {hasDetections && (
             <p>
               <strong>Detections:</strong> {detectionResult.detections.length}{" "}
-              Fracture area(s) found
+              Fracture area(s).
             </p>
           )}
           <p className="text-justify">

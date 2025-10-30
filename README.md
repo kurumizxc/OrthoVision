@@ -1,6 +1,6 @@
 # OrthoVision
 
-A full‑stack application for X‑ray fracture detection.
+A full‑stack assistive application for X‑ray fracture detection.
 
 - Frontend: Next.js 14 (App Router), React 18, Tailwind CSS, shadcn/ui, Radix UI, Zod, React Hook Form
 - Backend: FastAPI, Uvicorn, Pillow, OpenCV, PyTorch, Ultralytics YOLO
