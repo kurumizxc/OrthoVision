@@ -6,7 +6,6 @@ import {
 } from "@/components/ui/sidebar";
 import type { ImageDataWithResult } from "@/types/image";
 
-
 interface DetectionResultsProps {
   detectionResult: NonNullable<ImageDataWithResult["detectionResult"]>;
 }
@@ -40,7 +39,7 @@ export const DetectionResults = memo(function DetectionResults({
           {hasDetections && (
             <p>
               <strong>Detections:</strong> {detectionResult.detections.length}{" "}
-              Fracture area(s).
+              Fracture area(s) found.
             </p>
           )}
           <p className="text-justify">
