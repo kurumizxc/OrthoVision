@@ -7,7 +7,7 @@ from dotenv import load_dotenv
 import os
 from orthovision.load_model import load_model
 
-# Load environment variables from .env (e.g., FRONTEND_URL)
+# Load environment variables from .env (e.g., HF_TOKEN)
 load_dotenv()
 
 # Create FastAPI app and attach lifespan that loads models on startup
@@ -18,11 +18,11 @@ app = FastAPI(
 )
 
 # Configure CORS
-frontend_url = os.getenv("FRONTEND_URL", "http://localhost:3000").strip()
+allowed_origins = ["https://orthovision.vercel.app", "http://localhost:3000"]
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[frontend_url],
+    allow_origins=allowed_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
