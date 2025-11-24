@@ -10,8 +10,8 @@ import os
 MODEL_DIR = Path(__file__).resolve().parent.parent / "models"
 HF_REPO_ID = "kurumizxc/orthovision-models"  # Replace with private repo
 RESNET_FILE = "best_model_f1_focused.pth"
-YOLO_MODEL1_FILE = "fracatlas_train_best.pt"      # Model 1: FracAtlas (Binary)
-YOLO_MODEL2_FILE = "combined_bone_fracture_best.pt"  # Model 2: Combined (7-class)
+YOLO_MODEL1_FILE = "best.pt"      # Model 1: FracAtlas (Binary)
+YOLO_MODEL2_FILE = "best2.pt"     # Model 2: Combined (7-class)
 
 # Clear local model directory before redownloading new ones.
 def clear_old_models():
@@ -137,7 +137,8 @@ async def load_model(app):
     print("Cascade models loaded successfully!\n")
     print(f"  - ResNet18: {RESNET_FILE}")
     print(f"  - YOLO Model 1 (FracAtlas): {YOLO_MODEL1_FILE}")
-    print(f"  - YOLO Model 2 (Combined): {YOLO_MODEL2_FILE}\n")
+    print(f"  - YOLO Model 2 (Combined): {YOLO_MODEL2_FILE}")
+    print("  Ready to process X-ray images with cascade detection!\n")
 
     try:
         yield
