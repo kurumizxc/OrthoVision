@@ -15,6 +15,8 @@ export const DetectionResults = memo(function DetectionResults({
 }: DetectionResultsProps) {
   const isFractured = detectionResult.class === "Fractured";
   const hasDetections = (detectionResult.detections?.length || 0) > 0;
+  const hasModelInfo = detectionResult.model_used && detectionResult.model_used !== "None";
+  const hasWarning = detectionResult.warning;
 
   return (
     <SidebarGroup>
@@ -45,6 +47,16 @@ export const DetectionResults = memo(function DetectionResults({
           <p className="text-justify">
             <strong>Recommendation:</strong> {detectionResult.recommendation}
           </p>
+          {hasModelInfo && (
+            <p className="text-xs text-blue-600 bg-blue-50 p-2 rounded border border-blue-200">
+              <strong>Detection Model:</strong> {detectionResult.model_used}
+            </p>
+          )}
+          {hasWarning && (
+            <p className="text-xs text-amber-700 bg-amber-50 p-2 rounded border border-amber-300">
+              <strong>⚠️ Notice:</strong> {detectionResult.warning}
+            </p>
+          )}
         </div>
       </SidebarGroupContent>
     </SidebarGroup>
@@ -53,5 +65,7 @@ export const DetectionResults = memo(function DetectionResults({
 
 /**
  * DetectionResults shows classification, confidence, count of detections,
- * and the textual recommendation returned by the backend.
+ * the textual recommendation returned by the backend, which YOLO model
+ * was used for detection (cascade feature), and any warnings if manual
+ * review is recommended.
  */
