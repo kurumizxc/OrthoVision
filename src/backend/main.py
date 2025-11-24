@@ -36,19 +36,21 @@ async def read_root():
 # Fracture detection endpoint
 @app.post("/detect")
 async def detect_fracture(request: Request, image: UploadFile = File(...)):
-    # Run fracture detection on an uploaded X-ray image.
+    # Run fracture detection on an uploaded X-ray image using cascade YOLO detection.
     try:
         # Read uploaded file and open as PIL image
         contents = await image.read()
         pil_image = Image.open(BytesIO(contents))
         # Extract dimensions for frontend rendering
         width, height = pil_image.size
-        # Run inference using the app-scoped model
+        # Run inference using the app-scoped cascade detector
         result = request.app.state.model.process_image(pil_image)
         return JSONResponse({
             "class": result["class"],
             "confidence": f"{result['confidence'] * 100:.2f}%",
             "recommendation": result["recommendation"],
+            "model_used": result.get("model_used"),
+            "warning": result.get("warning"),
             "imageWidth": width,
             "imageHeight": height,
             "detections": result["detections"]
@@ -62,9 +64,10 @@ async def detect_fracture(request: Request, image: UploadFile = File(...)):
 
 # - Loads environment variables (dotenv) and configures CORS using FRONTEND_URL.
 # - Creates the FastAPI application and attaches a lifespan handler that
-#   loads ML models at startup via orthovision.load_model.load_model and
-#   exposes the detector on app.state.model.
+#   loads ML models (ResNet + dual YOLO cascade) at startup via orthovision.load_model.load_model
+#   and exposes the cascade detector on app.state.model.
 # - Exposes endpoints:
 #   - GET /          : Health check
-#   - POST /detect   : Accepts an image file and returns classification,
-#                      confidence, recommendation, image dimensions, and detections.
+#   - POST /detect   : Accepts an image file and returns classification, confidence,
+#                      recommendation, model_used (which YOLO model detected fractures),
+#                      warning (if manual review needed), image dimensions, and detections.

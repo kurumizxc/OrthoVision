@@ -10,7 +10,8 @@ import os
 MODEL_DIR = Path(__file__).resolve().parent.parent / "models"
 HF_REPO_ID = "kurumizxc/orthovision-models"  # Replace with private repo
 RESNET_FILE = "best_model_f1_focused.pth"
-YOLO_FILE = "best.pt"
+YOLO_MODEL1_FILE = "fracatlas_train_best.pt"      # Model 1: FracAtlas (Binary)
+YOLO_MODEL2_FILE = "combined_bone_fracture_best.pt"  # Model 2: Combined (7-class)
 
 # Clear local model directory before redownloading new ones.
 def clear_old_models():
@@ -76,24 +77,27 @@ def download_model(filename: str, hf_token: str) -> Path:
 # Ensure models exist and are up-to-date.
 # If the Hugging Face repo has a newer revision,
 # download fresh copies and clear old cache.
-def ensure_latest_models(hf_token: str | None = None) -> tuple[Path, Path]:
+def ensure_latest_models(hf_token: str | None = None) -> tuple[Path, Path, Path]:
     MODEL_DIR.mkdir(parents=True, exist_ok=True)
 
     resnet_path = MODEL_DIR / RESNET_FILE
-    yolo_path = MODEL_DIR / YOLO_FILE
+    yolo_model1_path = MODEL_DIR / YOLO_MODEL1_FILE
+    yolo_model2_path = MODEL_DIR / YOLO_MODEL2_FILE
 
     # Skip revision check: only download if files are missing
-    if not resnet_path.exists() or not yolo_path.exists():
+    if not resnet_path.exists() or not yolo_model1_path.exists() or not yolo_model2_path.exists():
         print("One or more model files are missing locally. Downloading required files...")
         try:
             if not resnet_path.exists():
                 resnet_path = download_model(RESNET_FILE, hf_token)
-            if not yolo_path.exists():
-                yolo_path = download_model(YOLO_FILE, hf_token)
+            if not yolo_model1_path.exists():
+                yolo_model1_path = download_model(YOLO_MODEL1_FILE, hf_token)
+            if not yolo_model2_path.exists():
+                yolo_model2_path = download_model(YOLO_MODEL2_FILE, hf_token)
         except Exception as e:
             print(f"Warning: Could not download missing models from Hugging Face: {e}")
             # If download failed and files are still missing, abort with clear error
-            if not resnet_path.exists() or not yolo_path.exists():
+            if not resnet_path.exists() or not yolo_model1_path.exists() or not yolo_model2_path.exists():
                 raise RuntimeError(
                     "Models not found locally and Hugging Face download failed. "
                     "Ensure HF_TOKEN is set (if repo is private) or pre-populate 'src/backend/models' with required files."
@@ -104,30 +108,36 @@ def ensure_latest_models(hf_token: str | None = None) -> tuple[Path, Path]:
     # Final existence check (no hashing to keep startup light)
     if not resnet_path.exists():
         raise FileNotFoundError(f"Missing model file: {resnet_path}")
-    if not yolo_path.exists():
-        raise FileNotFoundError(f"Missing model file: {yolo_path}")
+    if not yolo_model1_path.exists():
+        raise FileNotFoundError(f"Missing model file: {yolo_model1_path}")
+    if not yolo_model2_path.exists():
+        raise FileNotFoundError(f"Missing model file: {yolo_model2_path}")
 
-    return resnet_path, yolo_path
+    return resnet_path, yolo_model1_path, yolo_model2_path
 
 # Load or refresh models automatically at app startup.
 @asynccontextmanager
 async def load_model(app):
-    print("\nStarting OrthoVision backend...")
+    print("\nStarting OrthoVision backend with Cascade YOLO...")
     hf_token = os.getenv("HF_TOKEN")
 
     try:
-        resnet_path, yolo_path = ensure_latest_models(hf_token)
+        resnet_path, yolo_model1_path, yolo_model2_path = ensure_latest_models(hf_token)
     except Exception as e:
         print(f"Error checking Hugging Face: {e}")
         raise
 
-    print("Loading HybridFractureDetector...")
+    print("Loading HybridFractureDetector with dual YOLO models...")
     app.state.model = HybridFractureDetector(
         resnet_path=str(resnet_path),
-        yolo_path=str(yolo_path)
+        yolo_model1_path=str(yolo_model1_path),
+        yolo_model2_path=str(yolo_model2_path)
     )
 
-    print("Models loaded successfully!\n")
+    print("Cascade models loaded successfully!\n")
+    print(f"  - ResNet18: {RESNET_FILE}")
+    print(f"  - YOLO Model 1 (FracAtlas): {YOLO_MODEL1_FILE}")
+    print(f"  - YOLO Model 2 (Combined): {YOLO_MODEL2_FILE}\n")
 
     try:
         yield
