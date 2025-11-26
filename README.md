@@ -37,7 +37,7 @@ OrthoVision/
 ### For Evaluators: Model
 
 1. Download the model from this [Google Drive folder](https://drive.google.com/drive/folders/1iIxhkTjVSNPm36kcNdEpbsYbgZsRQlTv?usp=drive_link)
-2. Extract and place the model files in the `src/backend/models/` folder
+2. Place the model files in the `src/backend/models/` folder
 3. Ensure the folder structure matches the backend's expected model layout
 
 ## Environment Variables
