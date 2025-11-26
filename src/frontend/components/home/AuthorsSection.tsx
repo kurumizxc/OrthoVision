@@ -14,19 +14,19 @@ export function AuthorsSection() {
       </motion.div>
       <div className="space-y-1">
         <motion.div variants={itemVariants}>
-          <p className="text-gray-600 text-sm">John Doe</p>
+          <p className="text-gray-600 text-sm">Hallares</p>
         </motion.div>
         <motion.div variants={itemVariants}>
-          <p className="text-gray-600 text-sm">John Doe</p>
+          <p className="text-gray-600 text-sm">Selerio</p>
         </motion.div>
         <motion.div variants={itemVariants}>
-          <p className="text-gray-600 text-sm">John Doe</p>
+          <p className="text-gray-600 text-sm">Taganahan</p>
         </motion.div>
         <motion.div variants={itemVariants}>
-          <p className="text-gray-600 text-sm">John Doe</p>
+          <p className="text-gray-600 text-sm">Togonon</p>
         </motion.div>
         <motion.div variants={itemVariants}>
-          <p className="text-gray-600 text-sm">John Doe</p>
+          <p className="text-gray-600 text-sm">Trojillo</p>
         </motion.div>
       </div>
     </motion.section>
