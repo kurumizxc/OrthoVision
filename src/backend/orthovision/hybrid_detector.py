@@ -73,12 +73,16 @@ class HybridFractureDetector:
             yolo_results = self.detector(image, conf=0.30) # 0.30 is default but can be adjusted to be more or less sensitive
 
             if len(yolo_results[0].boxes) > 0:
-                for i, box in enumerate(yolo_results[0].boxes.xyxy):
+                boxes = yolo_results[0].boxes.xyxy.cpu().numpy()
+                confidences = yolo_results[0].boxes.conf.cpu().numpy()
+                
+                for i, (box, conf) in enumerate(zip(boxes, confidences)):
                     x1, y1, x2, y2 = map(float, box.tolist())
                     detections.append({
                         "id": i + 1,
                         "label": f"Fracture Area {i + 1}",
-                        "box": [x1, y1, x2, y2]
+                        "box": [x1, y1, x2, y2],
+                        "confidence": float(conf)  # Add confidence score for each detection
                     })
         
         results["detections"] = detections

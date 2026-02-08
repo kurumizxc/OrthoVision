@@ -138,12 +138,19 @@ export function CanvasEditor({ image }: CanvasEditorProps) {
         listening: false,
       });
 
+      // Format confidence as percentage with 1 decimal place if it exists
+      const confidenceText = detection.confidence !== undefined 
+        ? ` (${(detection.confidence * 100).toFixed(1)}%)` 
+        : '';
+      
       const text = new Konva.Text({
-        text: detection.label,
+        text: `${detection.label}${confidenceText}`,
         fontSize: 14,
         fontFamily: "Arial",
         fill: "#00ff00",
         listening: false,
+        padding: 2,
+        align: 'left',
       });
 
       const textHeight = text.height();
