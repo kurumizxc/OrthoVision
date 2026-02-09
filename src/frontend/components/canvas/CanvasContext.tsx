@@ -13,6 +13,8 @@ export interface CanvasContextValue {
   downloadCanvas: () => void
   showBoundingBoxes: boolean
   toggleBoundingBoxes: () => void
+  confidenceThreshold: number
+  setConfidenceThreshold: (value: number) => void
 }
 
 const CanvasContext = createContext<CanvasContextValue | undefined>(undefined)

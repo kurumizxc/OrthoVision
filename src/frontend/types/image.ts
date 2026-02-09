@@ -11,6 +11,7 @@ export interface BoundingBox {
   id: number;
   label: string;
   box: [number, number, number, number]; // [x1, y1, x2, y2]
+  confidence?: number;
 }
 
 export interface DetectionResult {

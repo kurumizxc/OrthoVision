@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState, useCallback } from "react";
+import { useEffect, useMemo, useRef, useState, useCallback } from "react";
 import {
   SidebarProvider,
   SidebarTrigger,
@@ -32,7 +32,9 @@ export function CanvasEditor({ image }: CanvasEditorProps) {
   const [stageScale, setStageScale] = useState(1);
   const [stagePosition, setStagePosition] = useState({ x: 0, y: 0 });
   const [showBoundingBoxes, setShowBoundingBoxes] = useState(true);
+  const [confidenceThreshold, setConfidenceThreshold] = useState(0.3);
   const [isImageReady, setIsImageReady] = useState(false);
+  const [imageNodeVersion, setImageNodeVersion] = useState(0);
   const displayImageUrlRef = useRef<string>(image.url);
   const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -90,6 +92,14 @@ export function CanvasEditor({ image }: CanvasEditorProps) {
   }, [image.url]);
 
   const detections = image.detectionResult?.detections || [];
+  const filteredDetections = useMemo(
+    () =>
+      detections.filter((detection) => {
+        if (detection.confidence === undefined) return true;
+        return detection.confidence >= confidenceThreshold;
+      }),
+    [detections, confidenceThreshold]
+  );
   const originalImageWidth = image.detectionResult?.imageWidth || 0;
   const originalImageHeight = image.detectionResult?.imageHeight || 0;
 
@@ -174,6 +184,17 @@ export function CanvasEditor({ image }: CanvasEditorProps) {
   useEffect(() => {
     if (!containerRef.current || !isImageReady) return;
 
+    if (stageRef.current) {
+      stageRef.current.destroy();
+      stageRef.current = null;
+    }
+
+    imageLayerRef.current = null;
+    boxLayerRef.current = null;
+    imageNodeRef.current = null;
+    boxGroupRef.current = null;
+    setImageNodeVersion(0);
+
     const container = containerRef.current;
     const containerWidth = container.offsetWidth;
     const containerHeight = container.offsetHeight;
@@ -229,18 +250,7 @@ export function CanvasEditor({ image }: CanvasEditorProps) {
       imageNodeRef.current = konvaImage;
       imageLayer.batchDraw();
 
-      if (detections.length > 0 && originalImageWidth && originalImageHeight) {
-        const scaleX = displayWidth / originalImageWidth;
-        const scaleY = displayHeight / originalImageHeight;
-
-        requestAnimationFrame(() => {
-          requestAnimationFrame(() => {
-            if (boxLayerRef.current && imageNodeRef.current) {
-              drawBoundingBoxes(boxLayer, detections, konvaImage, scaleX, scaleY);
-            }
-          });
-        });
-      }
+      setImageNodeVersion((version) => version + 1);
     };
 
     imageObj.onerror = (error) => {
@@ -305,10 +315,49 @@ export function CanvasEditor({ image }: CanvasEditorProps) {
     };
   }, [
     isImageReady,
-    detections,
-    originalImageWidth,
-    originalImageHeight,
     updateCanvasState,
+    image.url,
+  ]);
+
+  useEffect(() => {
+    const boxLayer = boxLayerRef.current;
+    const imageNode = imageNodeRef.current;
+    if (!boxLayer || !imageNode) return;
+
+    if (!showBoundingBoxes) {
+      if (boxGroupRef.current) {
+        boxGroupRef.current.destroy();
+        boxGroupRef.current = null;
+      }
+      boxLayer.batchDraw();
+      return;
+    }
+
+    if (!originalImageWidth || !originalImageHeight) {
+      return;
+    }
+
+    if (filteredDetections.length === 0) {
+      if (boxGroupRef.current) {
+        boxGroupRef.current.destroy();
+        boxGroupRef.current = null;
+      }
+      boxLayer.batchDraw();
+      return;
+    }
+
+    const displayWidth = imageNode.width();
+    const displayHeight = imageNode.height();
+    const scaleX = displayWidth / originalImageWidth;
+    const scaleY = displayHeight / originalImageHeight;
+
+    drawBoundingBoxes(boxLayer, filteredDetections, imageNode, scaleX, scaleY);
+  }, [
+    filteredDetections,
+    imageNodeVersion,
+    originalImageHeight,
+    originalImageWidth,
+    showBoundingBoxes,
   ]);
 
   // Show/hide the bounding box overlay layer when toggled
@@ -428,6 +477,8 @@ export function CanvasEditor({ image }: CanvasEditorProps) {
             downloadCanvas,
             showBoundingBoxes,
             toggleBoundingBoxes,
+            confidenceThreshold,
+            setConfidenceThreshold,
           }}
         >
           <CanvasSidebar />

@@ -70,8 +70,8 @@ class HybridFractureDetector:
         #YOLO Detection (bounding boxes only)
         detections = []
         if classification_result == 'Fractured' and confidence >= 0.5:
-            yolo_results = self.detector(image, conf=0.30) # 0.30 is default but can be adjusted to be more or less sensitive
-
+            yolo_results = self.detector(image, conf=0.1) # 0.30 is default but can be adjusted to be more or less sensitive
+                                                          # Set to lowest confidence threshold to ensure all possible detection, as confidence threshold is implemented in the frontend and can be adjusted by the user
             if len(yolo_results[0].boxes) > 0:
                 boxes = yolo_results[0].boxes.xyxy.cpu().numpy()
                 confidences = yolo_results[0].boxes.conf.cpu().numpy()
